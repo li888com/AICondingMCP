@@ -58,6 +58,20 @@ export async function createCodeSnapshot(projectPath: string): Promise<CodeSnaps
   };
 }
 
+export async function findGitRoot(projectPath = process.cwd()): Promise<string | null> {
+  const root = resolve(projectPath);
+
+  try {
+    const { stdout } = await execFileAsync("git", ["rev-parse", "--show-toplevel"], {
+      cwd: root,
+      maxBuffer: 1024 * 1024,
+    });
+    return resolve(stdout.trim());
+  } catch {
+    return null;
+  }
+}
+
 export async function getCodeStatsSinceSnapshot(projectPath: string, snapshot: CodeSnapshot): Promise<CodeStats> {
   const root = resolve(projectPath);
   const before = new Map(snapshot.files.map((file) => [file.path, file]));
@@ -170,7 +184,9 @@ async function listWorkspaceFiles(root: string): Promise<string[]> {
     maxBuffer: 20 * 1024 * 1024,
   });
 
-  return Array.from(new Set(stdout.split(/\r?\n/u).filter(Boolean))).sort();
+  return Array.from(new Set(stdout.split(/\r?\n/u).filter(Boolean)))
+    .filter((filePath) => !isStorageFile(root, filePath))
+    .sort();
 }
 
 async function countTextLines(root: string, filePath: string): Promise<number | null> {
@@ -243,11 +259,24 @@ async function getUntrackedFileStats(root: string): Promise<CodeFileStat[]> {
   const files = stdout.split(/\r?\n/u).filter(Boolean);
   const stats: CodeFileStat[] = [];
   for (const filePath of files) {
+    if (isStorageFile(root, filePath)) continue;
     const lineCount = await countTextLines(root, filePath);
     if (lineCount === null) continue;
     stats.push(toFileStat(filePath, lineCount, 0));
   }
   return stats;
+}
+
+function isStorageFile(root: string, filePath: string): boolean {
+  const storageRoot = resolve(process.env.MCP_TOOLBOX_STORAGE_DIR?.trim() || join(root, ".mcp-toolbox"));
+  const fullPath = resolve(root, filePath);
+  const normalizedStorageRoot = normalizePathForCompare(storageRoot);
+  const normalizedFullPath = normalizePathForCompare(fullPath);
+  return normalizedFullPath === normalizedStorageRoot || normalizedFullPath.startsWith(`${normalizedStorageRoot}/`);
+}
+
+function normalizePathForCompare(value: string): string {
+  return resolve(value).replaceAll("\\", "/").toLowerCase();
 }
 
 function toFileStat(filePath: string, linesAdded: number, linesDeleted: number): CodeFileStat {

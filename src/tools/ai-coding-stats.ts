@@ -1,7 +1,9 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { spawn } from "node:child_process";
 import { z } from "zod";
 import {
   createCodeSnapshot,
+  findGitRoot,
   getCodeStatsSinceSnapshot,
   getWorkspaceCodeStats,
   loadRoundBaseline,
@@ -58,13 +60,39 @@ export function registerAiCodingStatsTools(server: McpServer, hooks: RequestLife
     "Capture a Git workspace baseline at the start of an AI Coding round. record_ai_coding_round can later use this baseline to compute per-round code line stats.",
     {
       conversationId: z.string().min(1).describe("Stable id for the AI Coding conversation/thread."),
-      projectPath: z.string().min(1).describe("Absolute Git workspace path."),
+      projectPath: z
+        .string()
+        .min(1)
+        .optional()
+        .describe("Absolute Git workspace path. Defaults to metadata.projectPath, project path parsed from conversationId, or the current Git workspace."),
       startedAt: z.string().datetime().optional().describe("Round start time, ISO 8601. Defaults to now."),
       metadata: z.record(z.unknown()).optional().describe("Optional extra structured data.")
     },
     withLifecycle(hooks, async (input) => {
-      const snapshot = await createCodeSnapshot(input.projectPath);
-      const saved = await saveRoundBaseline(input.conversationId, input.projectPath, snapshot);
+      const projectResolution = await resolveProjectPath(input.conversationId, input.projectPath, input.metadata);
+      if (!projectResolution.projectPath) {
+        const result = {
+          conversationId: input.conversationId,
+          projectPath: null,
+          startedAt: input.startedAt ?? new Date().toISOString(),
+          skipped: true,
+          reason: projectResolution.reason,
+          metadata: input.metadata ?? null,
+        };
+
+        return {
+          content: [
+            {
+              type: "text",
+              text: JSON.stringify(result, null, 2)
+            }
+          ],
+          structuredContent: result
+        };
+      }
+
+      const snapshot = await createCodeSnapshot(projectResolution.projectPath);
+      const saved = await saveRoundBaseline(input.conversationId, projectResolution.projectPath, snapshot);
       const result = {
         conversationId: input.conversationId,
         projectPath: snapshot.projectPath,
@@ -119,7 +147,8 @@ export function registerAiCodingStatsTools(server: McpServer, hooks: RequestLife
       metadata: z.record(z.unknown()).optional().describe("Optional extra structured data.")
     },
     withLifecycle(hooks, async (input) => {
-      const projectPath = input.projectPath ?? stringValue(input.metadata?.projectPath) ?? projectFromConversationId(input.conversationId);
+      const projectResolution = await resolveProjectPath(input.conversationId, input.projectPath, input.metadata);
+      const projectPath = projectResolution.projectPath;
       const computedCodeStats = projectPath ? await computeMcpCodeStats(input.conversationId, projectPath) : null;
       const metadata = {
         ...(input.metadata ?? {}),
@@ -127,6 +156,7 @@ export function registerAiCodingStatsTools(server: McpServer, hooks: RequestLife
         ...(computedCodeStats?.metadata ?? {
           codeStatsSource: input.codeLinesChanged !== undefined ? "mcp payload explicit code stats" : "mcp code stats unavailable",
           codeStatsPrecision: input.codeLinesChanged !== undefined ? "payload-explicit" : "unavailable",
+          codeStatsSkippedReason: projectResolution.reason,
         }),
         tokenStatsSource: "tool_log_backfill",
         tokenStatsUnavailable: (input.totalTokens ?? (input.inputTokens ?? 0) + (input.outputTokens ?? 0)) <= 0,
@@ -142,6 +172,7 @@ export function registerAiCodingStatsTools(server: McpServer, hooks: RequestLife
         totalTokens: input.totalTokens ?? 0,
         metadata,
       });
+      triggerOnlineSyncPipeline(recorded.id, metadata);
 
       return {
         content: [
@@ -216,6 +247,32 @@ function withLifecycle<TInput, TResult>(
   };
 }
 
+function triggerOnlineSyncPipeline(roundId: number, metadata: Record<string, unknown>): void {
+  if (process.env.AI_CODING_AUTO_UPLOAD_ON_MCP === "0") {
+    return;
+  }
+
+  const command = process.platform === "win32" ? "cmd.exe" : "npm";
+  const args = [
+    "run",
+    "sync:pipeline:start",
+    "--",
+    "--round-id",
+    String(roundId),
+    "--client",
+    typeof metadata.client === "string" ? metadata.client : "codex",
+    "--delay-ms",
+    process.env.AI_CODING_TOKEN_BACKFILL_DELAY_MS ?? "120000",
+  ];
+  const child = spawn(command, process.platform === "win32" ? ["/d", "/s", "/c", "npm.cmd", ...args] : args, {
+    cwd: process.cwd(),
+    detached: true,
+    stdio: "ignore",
+    env: process.env,
+  });
+  child.unref();
+}
+
 async function computeMcpCodeStats(conversationId: string, projectPath: string) {
   const baseline = await loadRoundBaseline(conversationId, projectPath);
   if (baseline) {
@@ -247,6 +304,34 @@ async function computeMcpCodeStats(conversationId: string, projectPath: string) 
       codeStatsError: error instanceof Error ? error.message : String(error),
     }
   }));
+}
+
+async function resolveProjectPath(
+  conversationId: string,
+  explicitProjectPath?: string,
+  metadata?: Record<string, unknown>
+): Promise<{ projectPath: string | null; reason?: string }> {
+  const candidates = [
+    explicitProjectPath,
+    stringValue(metadata?.projectPath),
+    projectFromConversationId(conversationId),
+    process.env.AI_CODING_PROJECT_PATH,
+    process.env.CODEX_WORKSPACE,
+    process.env.WORKSPACE_FOLDER,
+    process.cwd(),
+  ].filter((value): value is string => Boolean(value));
+
+  for (const candidate of candidates) {
+    const gitRoot = await findGitRoot(candidate);
+    if (gitRoot) {
+      return { projectPath: gitRoot };
+    }
+  }
+
+  return {
+    projectPath: null,
+    reason: "No Git workspace found from projectPath, metadata.projectPath, conversationId, workspace environment variables, or current working directory",
+  };
 }
 
 function stringValue(value: unknown): string | undefined {

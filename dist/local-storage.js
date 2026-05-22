@@ -136,6 +136,7 @@ function normalizeAutoSyncState(value) {
         return null;
     return {
         workerId: typeof value.workerId === "string" ? value.workerId : null,
+        pid: Number.isSafeInteger(Number(value.pid)) ? Number(value.pid) : null,
         status: ["idle", "running", "stopped", "failed"].includes(String(value.status))
             ? value.status
             : "idle",
@@ -326,6 +327,18 @@ export async function createTokenUsageEvent(event) {
         return newEvent;
     });
 }
+export async function updateTokenUsageEvent(event) {
+    await withStorageLock(async () => {
+        const data = await loadData(true);
+        const index = data.tokenUsageEvents.findIndex((item) => item.id === event.id);
+        if (index >= 0) {
+            data.tokenUsageEvents[index] = event;
+            await saveData(data);
+            return;
+        }
+        throw new Error(`Token usage event ${event.id} not found`);
+    });
+}
 export async function deleteTokenUsageEventsByRound(roundId) {
     return withStorageLock(async () => {
         const data = await loadData(true);
@@ -418,6 +431,7 @@ export async function patchAutoSyncState(patch) {
         const now = new Date().toISOString();
         const current = data.autoSyncState ?? {
             workerId: null,
+            pid: null,
             status: "idle",
             startedAt: null,
             lastHeartbeatAt: null,

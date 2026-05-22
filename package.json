@@ -4,12 +4,24 @@
   "private": true,
   "type": "module",
   "description": "Lightweight MCP server for AI Coding round stats. MCP records code line stats; logs backfill token usage.",
+  "bin": {
+    "ai-coding-stats": "dist/cli.js"
+  },
   "scripts": {
     "build": "tsc -p tsconfig.json",
+    "cli": "tsx src/cli.ts",
     "dev": "tsx src/ai-coding-stats-server.ts",
     "start": "node dist/ai-coding-stats-server.js",
+    "auto": "tsx src/auto-runner.ts",
+    "dialogue": "tsx src/auto-runner.ts --dialogue",
+    "auto:start": "node dist/auto-runner.js",
+    "dialogue:start": "node dist/auto-runner.js --dialogue",
+    "sync:pipeline": "tsx src/online-sync-pipeline.ts",
+    "sync:pipeline:start": "node dist/online-sync-pipeline.js",
     "sync:online": "tsx src/sync-to-online.ts",
-    "sync:online:dry": "tsx src/sync-to-online.ts --dry-run"
+    "sync:online:dry": "tsx src/sync-to-online.ts --dry-run",
+    "tokens:backfill": "tsx src/token-backfill.ts",
+    "tokens:backfill:start": "node dist/token-backfill.js"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.12.0",

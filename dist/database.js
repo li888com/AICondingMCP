@@ -1,4 +1,5 @@
 import { resolveRequirementId } from "./requirement.js";
+import { loadReporterDemandBinding } from "./reporter-binding.js";
 import * as localStorage from "./local-storage.js";
 export function getPool() {
     throw new Error("SQL pool is not available in local storage mode");
@@ -9,7 +10,7 @@ export async function closePool() {
 export async function recordRound(input) {
     validateInput(input);
     const conversationId = normalizeConversationId(input.conversationId);
-    const metadata = normalizeMetadata(input.metadata, conversationId);
+    const metadata = await normalizeMetadata(input.metadata, conversationId);
     // Get or create conversation
     let conversation = await localStorage.getConversation(conversationId);
     const now = new Date().toISOString();
@@ -77,7 +78,7 @@ export async function recordRound(input) {
 export async function recordDialogueTokenUsage(input) {
     validateDialogueTokenUsageInput(input);
     const conversationId = normalizeConversationId(input.conversationId);
-    const metadata = normalizeMetadata(input.metadata, conversationId);
+    const metadata = await normalizeMetadata(input.metadata, conversationId);
     const now = new Date().toISOString();
     let conversation = await localStorage.getConversation(conversationId);
     if (!conversation) {
@@ -138,7 +139,7 @@ export async function recordDialogueTokenUsage(input) {
 export async function recordRoundRevert(input) {
     validateRevertInput(input);
     const conversationId = normalizeConversationId(input.conversationId);
-    const metadata = normalizeMetadata(input.metadata, conversationId);
+    const metadata = await normalizeMetadata(input.metadata, conversationId);
     // Get or create conversation
     let conversation = await localStorage.getConversation(conversationId);
     const now = new Date().toISOString();
@@ -218,7 +219,7 @@ export async function recordRoundRevert(input) {
 function normalizeConversationId(conversationId) {
     return conversationId.trim().replaceAll("\\", "/");
 }
-function normalizeMetadata(metadata, conversationId) {
+async function normalizeMetadata(metadata, conversationId) {
     const normalized = metadata ? { ...metadata } : {};
     if (typeof normalized.client === "string") {
         normalized.client = normalized.client.trim();
@@ -229,10 +230,35 @@ function normalizeMetadata(metadata, conversationId) {
     if (projectPath) {
         normalized.projectPath = normalizePathForMetadata(projectPath);
     }
+    if (!hasDemandBinding(normalized)) {
+        const binding = await loadReporterDemandBinding(projectPath);
+        if (binding) {
+            normalized.bindingLevel = binding.bindingLevel;
+            normalized.demandId = binding.demandId;
+            if (binding.demandCode)
+                normalized.demandCode = binding.demandCode;
+            if (binding.demandName)
+                normalized.demandName = binding.demandName;
+            if (binding.phaseName)
+                normalized.phaseName = binding.phaseName;
+            if (binding.projectCode)
+                normalized.projectCode = binding.projectCode;
+            if (binding.projectName)
+                normalized.projectName = binding.projectName;
+            if (binding.taskId)
+                normalized.taskId = binding.taskId;
+            if (binding.selectedAt)
+                normalized.requirementSelectedAt = binding.selectedAt;
+            normalized.requirementBindingSource = "ai-coding-reporter";
+        }
+    }
     if (Object.keys(normalized).length === 0) {
         return null;
     }
     return normalized;
+}
+function hasDemandBinding(metadata) {
+    return typeof metadata.demandId === "string" && metadata.demandId.trim().length > 0;
 }
 function projectFromConversationId(conversationId) {
     const match = conversationId.match(/^(?:codex|claude):(.+?)(?::[^/].*)?$/);

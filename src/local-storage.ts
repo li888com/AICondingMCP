@@ -147,6 +147,7 @@ type AiCodingCorrection = {
 
 type AutoSyncState = {
   workerId: string | null;
+  pid: number | null;
   status: "idle" | "running" | "stopped" | "failed";
   startedAt: string | null;
   lastHeartbeatAt: string | null;
@@ -319,6 +320,7 @@ function normalizeAutoSyncState(value: unknown): AutoSyncState | null {
   if (!isRecord(value)) return null;
   return {
     workerId: typeof value.workerId === "string" ? value.workerId : null,
+    pid: Number.isSafeInteger(Number(value.pid)) ? Number(value.pid) : null,
     status: ["idle", "running", "stopped", "failed"].includes(String(value.status))
       ? value.status as AutoSyncState["status"]
       : "idle",
@@ -545,6 +547,19 @@ export async function createTokenUsageEvent(event: Omit<TokenUsageEvent, "id" | 
   });
 }
 
+export async function updateTokenUsageEvent(event: TokenUsageEvent): Promise<void> {
+  await withStorageLock(async () => {
+    const data = await loadData(true);
+    const index = data.tokenUsageEvents.findIndex((item) => item.id === event.id);
+    if (index >= 0) {
+      data.tokenUsageEvents[index] = event;
+      await saveData(data);
+      return;
+    }
+    throw new Error(`Token usage event ${event.id} not found`);
+  });
+}
+
 export async function deleteTokenUsageEventsByRound(roundId: number): Promise<number> {
   return withStorageLock(async () => {
     const data = await loadData(true);
@@ -657,6 +672,7 @@ export async function patchAutoSyncState(patch: Partial<AutoSyncState>): Promise
     const now = new Date().toISOString();
     const current: AutoSyncState = data.autoSyncState ?? {
       workerId: null,
+      pid: null,
       status: "idle",
       startedAt: null,
       lastHeartbeatAt: null,

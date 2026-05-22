@@ -1,4 +1,5 @@
 import { resolveRequirementId } from "./requirement.js";
+import { loadReporterDemandBinding } from "./reporter-binding.js";
 import * as localStorage from "./local-storage.js";
 
 type TokenClient = "codex" | "claude-code";
@@ -98,7 +99,7 @@ export async function recordRound(input: RecordRoundInput): Promise<RecordedRoun
   validateInput(input);
 
   const conversationId = normalizeConversationId(input.conversationId);
-  const metadata = normalizeMetadata(input.metadata, conversationId);
+  const metadata = await normalizeMetadata(input.metadata, conversationId);
 
   // Get or create conversation
   let conversation = await localStorage.getConversation(conversationId);
@@ -174,7 +175,7 @@ export async function recordDialogueTokenUsage(input: RecordDialogueTokenUsageIn
   validateDialogueTokenUsageInput(input);
 
   const conversationId = normalizeConversationId(input.conversationId);
-  const metadata = normalizeMetadata(input.metadata, conversationId);
+  const metadata = await normalizeMetadata(input.metadata, conversationId);
   const now = new Date().toISOString();
 
   let conversation = await localStorage.getConversation(conversationId);
@@ -240,7 +241,7 @@ export async function recordRoundRevert(input: RecordRoundRevertInput): Promise<
   validateRevertInput(input);
 
   const conversationId = normalizeConversationId(input.conversationId);
-  const metadata = normalizeMetadata(input.metadata, conversationId);
+  const metadata = await normalizeMetadata(input.metadata, conversationId);
 
   // Get or create conversation
   let conversation = await localStorage.getConversation(conversationId);
@@ -328,10 +329,10 @@ function normalizeConversationId(conversationId: string): string {
   return conversationId.trim().replaceAll("\\", "/");
 }
 
-function normalizeMetadata(
+async function normalizeMetadata(
   metadata: Record<string, unknown> | undefined,
   conversationId: string
-): Record<string, unknown> | null {
+): Promise<Record<string, unknown> | null> {
   const normalized: Record<string, unknown> = metadata ? { ...metadata } : {};
 
   if (typeof normalized.client === "string") {
@@ -347,11 +348,31 @@ function normalizeMetadata(
     normalized.projectPath = normalizePathForMetadata(projectPath);
   }
 
+  if (!hasDemandBinding(normalized)) {
+    const binding = await loadReporterDemandBinding(projectPath);
+    if (binding) {
+      normalized.bindingLevel = binding.bindingLevel;
+      normalized.demandId = binding.demandId;
+      if (binding.demandCode) normalized.demandCode = binding.demandCode;
+      if (binding.demandName) normalized.demandName = binding.demandName;
+      if (binding.phaseName) normalized.phaseName = binding.phaseName;
+      if (binding.projectCode) normalized.projectCode = binding.projectCode;
+      if (binding.projectName) normalized.projectName = binding.projectName;
+      if (binding.taskId) normalized.taskId = binding.taskId;
+      if (binding.selectedAt) normalized.requirementSelectedAt = binding.selectedAt;
+      normalized.requirementBindingSource = "ai-coding-reporter";
+    }
+  }
+
   if (Object.keys(normalized).length === 0) {
     return null;
   }
 
   return normalized;
+}
+
+function hasDemandBinding(metadata: Record<string, unknown>): boolean {
+  return typeof metadata.demandId === "string" && metadata.demandId.trim().length > 0;
 }
 
 function projectFromConversationId(conversationId: string): string | undefined {

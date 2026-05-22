@@ -177,6 +177,7 @@ async function syncRounds(data: StorageData, report: SyncReport): Promise<void> 
   const requirementsById = new Map((data.requirements || []).map((item) => [item.requirementId, item]));
 
   for (const round of data.rounds || []) {
+    if (args.roundId !== null && round.id !== args.roundId) continue;
     if (!shouldUpload(round, report)) continue;
     if (isLimitReached(report)) break;
 
@@ -208,13 +209,13 @@ async function syncRounds(data: StorageData, report: SyncReport): Promise<void> 
         inputTokens: round.totalTokens > 0 ? round.inputTokens : null,
         outputTokens: round.totalTokens > 0 ? round.outputTokens : null,
         totalTokens: round.totalTokens > 0 ? round.totalTokens : null,
-        bindingLevel: round.requirementId === null ? "none" : "demand",
+        bindingLevel: round.metadata?.demandId ? "demand" : (round.requirementId === null ? "none" : "demand"),
         demandId: round.metadata?.demandId ?? null,
         demandCode: round.metadata?.demandCode ?? (round.requirementId === null ? null : String(round.requirementId)),
-        demandName: requirement?.title ?? null,
+        demandName: round.metadata?.demandName ?? requirement?.title ?? null,
         phaseName: round.metadata?.phaseName ?? null,
         projectCode: round.metadata?.projectCode ?? null,
-        projectNameBound: requirement?.projectName ?? null,
+        projectNameBound: round.metadata?.projectName ?? requirement?.projectName ?? null,
         taskId: round.metadata?.taskId ?? null,
         taskCode: round.metadata?.taskCode ?? null,
         taskName: round.metadata?.taskName ?? null,
@@ -240,6 +241,7 @@ async function syncRounds(data: StorageData, report: SyncReport): Promise<void> 
 
 async function syncRoundReverts(data: StorageData, report: SyncReport): Promise<void> {
   for (const revert of data.roundReverts || []) {
+    if (args.roundId !== null && revert.targetRoundId !== args.roundId) continue;
     if (!shouldUpload(revert, report)) continue;
     if (isLimitReached(report)) break;
 
@@ -253,6 +255,7 @@ async function syncRoundReverts(data: StorageData, report: SyncReport): Promise<
 
 async function syncTokenUsageEvents(data: StorageData, report: SyncReport): Promise<void> {
   for (const event of data.tokenUsageEvents || []) {
+    if (args.roundId !== null && event.roundId !== args.roundId) continue;
     if (!shouldUpload(event, report)) continue;
     if (isLimitReached(report)) break;
 
@@ -488,6 +491,7 @@ function printReport(report: SyncReport): void {
   console.log(`API base: ${baseUrl}`);
   console.log(`turnApiPath: ${turnApiPath}`);
   console.log(`limit: ${args.limit}`);
+  console.log(`roundId: ${args.roundId ?? "all"}`);
   console.log(`processed: ${report.processed}`);
   console.log(`rounds: ${report.rounds}`);
   console.log(`roundReverts: ${report.roundReverts}`);
@@ -497,11 +501,12 @@ function printReport(report: SyncReport): void {
   console.log(`failed: ${report.failed}`);
 }
 
-function parseArgs(argv: string[]): { dryRun: boolean; limit: number; retryFailedNow: boolean } {
+function parseArgs(argv: string[]): { dryRun: boolean; limit: number; retryFailedNow: boolean; roundId: number | null } {
   const parsed = {
     dryRun: false,
     limit: readNumberEnv("ONLINE_SYNC_LIMIT", 200),
     retryFailedNow: false,
+    roundId: null as number | null,
   };
 
   for (let index = 0; index < argv.length; index += 1) {
@@ -513,6 +518,13 @@ function parseArgs(argv: string[]): { dryRun: boolean; limit: number; retryFaile
       parsed.retryFailedNow = true;
     } else if (arg === "--limit" && next) {
       parsed.limit = Number(next);
+      index += 1;
+    } else if (arg === "--round-id" && next) {
+      const roundId = Number(next);
+      if (!Number.isSafeInteger(roundId) || roundId <= 0) {
+        throw new Error("--round-id must be a positive integer");
+      }
+      parsed.roundId = roundId;
       index += 1;
     }
   }

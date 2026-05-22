@@ -24,6 +24,19 @@ export async function createCodeSnapshot(projectPath) {
         files,
     };
 }
+export async function findGitRoot(projectPath = process.cwd()) {
+    const root = resolve(projectPath);
+    try {
+        const { stdout } = await execFileAsync("git", ["rev-parse", "--show-toplevel"], {
+            cwd: root,
+            maxBuffer: 1024 * 1024,
+        });
+        return resolve(stdout.trim());
+    }
+    catch {
+        return null;
+    }
+}
 export async function getCodeStatsSinceSnapshot(projectPath, snapshot) {
     const root = resolve(projectPath);
     const before = new Map(snapshot.files.map((file) => [file.path, file]));
@@ -121,7 +134,9 @@ async function listWorkspaceFiles(root) {
         cwd: root,
         maxBuffer: 20 * 1024 * 1024,
     });
-    return Array.from(new Set(stdout.split(/\r?\n/u).filter(Boolean))).sort();
+    return Array.from(new Set(stdout.split(/\r?\n/u).filter(Boolean)))
+        .filter((filePath) => !isStorageFile(root, filePath))
+        .sort();
 }
 async function countTextLines(root, filePath) {
     const snapshot = await getFileSnapshot(root, filePath);
@@ -188,12 +203,24 @@ async function getUntrackedFileStats(root) {
     const files = stdout.split(/\r?\n/u).filter(Boolean);
     const stats = [];
     for (const filePath of files) {
+        if (isStorageFile(root, filePath))
+            continue;
         const lineCount = await countTextLines(root, filePath);
         if (lineCount === null)
             continue;
         stats.push(toFileStat(filePath, lineCount, 0));
     }
     return stats;
+}
+function isStorageFile(root, filePath) {
+    const storageRoot = resolve(process.env.MCP_TOOLBOX_STORAGE_DIR?.trim() || join(root, ".mcp-toolbox"));
+    const fullPath = resolve(root, filePath);
+    const normalizedStorageRoot = normalizePathForCompare(storageRoot);
+    const normalizedFullPath = normalizePathForCompare(fullPath);
+    return normalizedFullPath === normalizedStorageRoot || normalizedFullPath.startsWith(`${normalizedStorageRoot}/`);
+}
+function normalizePathForCompare(value) {
+    return resolve(value).replaceAll("\\", "/").toLowerCase();
 }
 function toFileStat(filePath, linesAdded, linesDeleted) {
     return {
