@@ -2,15 +2,23 @@ import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 const args = parseArgs(process.argv.slice(2));
 const dryRun = args.dryRun;
+const storageDir = resolve(process.env.MCP_TOOLBOX_STORAGE_DIR?.trim() || ".mcp-toolbox");
 const storagePath = resolve(process.env.MCP_TOOLBOX_STORAGE_FILE?.trim() ||
-    resolve(process.env.MCP_TOOLBOX_STORAGE_DIR?.trim() || ".mcp-toolbox", "data.json"));
-const baseUrl = (process.env.AI_CODING_REPORT_API_BASE_URL ||
-    process.env.SYNC_API_BASE_URL ||
-    "http://127.0.0.1:9906").replace(/\/+$/, "");
-const turnApiPath = normalizePath(process.env.AI_CODING_TURN_API_PATH || process.env.SYNC_TURN_API_PATH || "/ai-codingTurns");
-const token = process.env.SYNC_API_TOKEN?.trim();
-const externalSysKey = process.env.AI_CODING_EXTERNAL_SYS_KEY?.trim();
-const externalSysSecret = process.env.AI_CODING_EXTERNAL_SYS_SECRET?.trim();
+    resolve(storageDir, "data.json"));
+const reporterConfigPath = resolve("ai-token-vscode-codex-claude-code", ".ai-coding-reporter", "config.json");
+const mcpConfigPath = resolve(storageDir, "config.json");
+const configPaths = process.env.AI_CODING_SYNC_CONFIG_FILE?.trim()
+    ? [resolve(process.env.AI_CODING_SYNC_CONFIG_FILE.trim())]
+    : [reporterConfigPath, mcpConfigPath];
+const config = await loadMergedConfig(configPaths);
+const baseUrl = configValue(process.env.AI_CODING_REPORT_API_BASE_URL, process.env.SYNC_API_BASE_URL, config.reportApiBaseUrl, config.apiBaseUrl, "http://127.0.0.1:9906").replace(/\/+$/, "");
+const turnApiPath = normalizePath(configValue(process.env.AI_CODING_TURN_API_PATH, process.env.SYNC_TURN_API_PATH, config.turnApiPath, "/ai-codingTurns"));
+const token = optionalConfigValue(process.env.SYNC_API_TOKEN, process.env.AI_CODING_ACCESS_TOKEN, config.token, config.accessToken);
+const externalSysKey = optionalConfigValue(process.env.AI_CODING_EXTERNAL_SYS_KEY, config.externalSysKey);
+const externalSysSecret = optionalConfigValue(process.env.AI_CODING_EXTERNAL_SYS_SECRET, config.externalSysSecret);
+const employeeId = configValue(process.env.AI_CODING_EMPLOYEE_ID, config.employeeId, "");
+const userName = configValue(process.env.AI_CODING_USER_NAME, config.userName, "");
+const teamId = configValue(process.env.AI_CODING_TEAM_ID, config.teamId, "");
 async function main() {
     const data = await loadData();
     const report = {
@@ -53,9 +61,9 @@ async function syncRounds(data, report) {
                 idempotencyKey: `local-turn-${turnId}`,
                 turnId,
                 conversationId: round.conversationId,
-                employeeId: String(round.metadata?.employeeId ?? process.env.AI_CODING_EMPLOYEE_ID ?? ""),
-                userName: String(round.metadata?.userName ?? process.env.AI_CODING_USER_NAME ?? ""),
-                teamId: String(round.metadata?.teamId ?? process.env.AI_CODING_TEAM_ID ?? ""),
+                employeeId: String(round.metadata?.employeeId ?? employeeId),
+                userName: String(round.metadata?.userName ?? userName),
+                teamId: String(round.metadata?.teamId ?? teamId),
                 tool: String(round.metadata?.client ?? "codex"),
                 modelName: round.modelName,
                 projectPath: String(round.metadata?.projectPath ?? ""),
@@ -121,25 +129,20 @@ async function syncTokenUsageEvents(data, report) {
             continue;
         if (isLimitReached(report))
             break;
-        if (event.roundId === null) {
-            markSkipped(event, "Token usage event has no roundId.");
-            report.skipped += 1;
-            report.processed += 1;
-            await saveCheckpoint(data);
-            continue;
-        }
-        const localRound = (data.rounds || []).find((round) => round.id === event.roundId);
-        if (!localRound) {
+        const localRound = event.roundId === null
+            ? null
+            : (data.rounds || []).find((round) => round.id === event.roundId) ?? null;
+        if (event.roundId !== null && !localRound) {
             markFailed(event, `Missing local round ${event.roundId}`);
             report.failed += 1;
             report.processed += 1;
             await saveCheckpoint(data);
             continue;
         }
-        await uploadItem(event, report, "tokenUsageEvents", async () => request(`${turnApiPath}/${encodeURIComponent(buildTurnId(localRound))}/tokens`, "PATCH", {
+        await uploadItem(event, report, "tokenUsageEvents", async () => request(`${turnApiPath}/${encodeURIComponent(buildTokenEventTurnId(event, localRound))}/tokens`, "PATCH", {
             sourceEventId: event.sourceEventId ?? `local-token-event-${event.id}`,
             tokenStatus: event.matchQuality === "ambiguous" ? "needs_review" : "completed",
-            tokenSource: "tool_log",
+            tokenSource: event.sourcePath.startsWith("mcp:") ? "mcp_payload" : "tool_log",
             inputTokens: event.inputTokens,
             outputTokens: event.outputTokens,
             totalTokens: event.totalTokens,
@@ -149,6 +152,10 @@ async function syncTokenUsageEvents(data, report) {
             occurredAt: event.endedAt ?? event.startedAt ?? new Date().toISOString(),
             metadata: {
                 tool: event.client,
+                conversationId: event.conversationId ?? localRound?.conversationId ?? null,
+                modelName: event.modelName ?? localRound?.modelName ?? null,
+                needsProjectBinding: event.roundId === null,
+                projectBindingWarning: event.roundId === null ? "No roundId was provided. Please bind this dialogue to a project/AI Coding round." : null,
                 sourcePath: event.sourcePath,
                 localTokenUsageEventId: event.id,
                 localRoundId: event.roundId,
@@ -248,12 +255,54 @@ function normalizePath(path) {
         return "/ai-codingTurns";
     return trimmed.startsWith("/") ? trimmed.replace(/\/+$/, "") : `/${trimmed.replace(/\/+$/, "")}`;
 }
+async function loadMergedConfig(paths) {
+    const configs = await Promise.all(paths.map((path) => loadConfig(path)));
+    return configs.reduceRight((merged, item) => ({ ...merged, ...item }), {});
+}
+async function loadConfig(path) {
+    try {
+        const content = await readFile(path, "utf8");
+        const parsed = JSON.parse(content);
+        return isRecord(parsed) ? parsed : {};
+    }
+    catch (error) {
+        const code = error instanceof Error ? error.code : undefined;
+        if (code === "ENOENT") {
+            return {};
+        }
+        throw error;
+    }
+}
+function configValue(...values) {
+    for (const value of values) {
+        if (typeof value === "string" && value.trim()) {
+            return value.trim();
+        }
+    }
+    return "";
+}
+function optionalConfigValue(...values) {
+    const value = configValue(...values);
+    return value || undefined;
+}
+function isRecord(value) {
+    return typeof value === "object" && value !== null && !Array.isArray(value);
+}
 function buildTurnId(round) {
     const metadataTurnId = round.metadata?.turnId;
     if (typeof metadataTurnId === "string" && metadataTurnId.trim()) {
         return metadataTurnId.trim();
     }
     return `codex-mcp-round-${round.id}`;
+}
+function buildTokenEventTurnId(event, round) {
+    if (round) {
+        return buildTurnId(round);
+    }
+    if (event.turnId?.trim()) {
+        return event.turnId.trim();
+    }
+    return `codex-mcp-dialogue-token-${event.id}`;
 }
 function mapTokenStatus(status) {
     if (status === "synced")

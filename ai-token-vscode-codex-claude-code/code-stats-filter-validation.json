@@ -1,0 +1,114 @@
+{
+  "tempRepo": "C:\\Users\\00232924\\AppData\\Local\\Temp\\ai-code-stats-filter-kla9g_5h",
+  "ignorePatterns": [
+    "node_modules/",
+    "dist/",
+    "build/",
+    "coverage/",
+    ".next/",
+    "out/",
+    "target/",
+    "package-lock.json",
+    "pnpm-lock.yaml",
+    "yarn.lock",
+    "*.min.js",
+    "*.map"
+  ],
+  "trackedDiffWithoutIntentToAddRows": [],
+  "untrackedFilesByLsFiles": [
+    {
+      "path": "docs/readme.md",
+      "lines": 2
+    },
+    {
+      "path": "src/app.ts",
+      "lines": 2
+    }
+  ],
+  "rows": [
+    {
+      "path": "build/output.js",
+      "added": 1,
+      "deleted": 0,
+      "ignored": true
+    },
+    {
+      "path": "coverage/lcov.info",
+      "added": 1,
+      "deleted": 0,
+      "ignored": true
+    },
+    {
+      "path": "dist/app.js",
+      "added": 1,
+      "deleted": 0,
+      "ignored": true
+    },
+    {
+      "path": "docs/readme.md",
+      "added": 2,
+      "deleted": 0,
+      "ignored": false
+    },
+    {
+      "path": "node_modules/a/index.js",
+      "added": 1,
+      "deleted": 0,
+      "ignored": true
+    },
+    {
+      "path": "package-lock.json",
+      "added": 3,
+      "deleted": 0,
+      "ignored": true
+    },
+    {
+      "path": "pnpm-lock.yaml",
+      "added": 1,
+      "deleted": 0,
+      "ignored": true
+    },
+    {
+      "path": "src/app.ts",
+      "added": 2,
+      "deleted": 0,
+      "ignored": false
+    },
+    {
+      "path": "web/app.js.map",
+      "added": 1,
+      "deleted": 0,
+      "ignored": true
+    },
+    {
+      "path": "web/app.min.js",
+      "added": 1,
+      "deleted": 0,
+      "ignored": true
+    }
+  ],
+  "totals": {
+    "filesChanged": 2,
+    "linesAdded": 4,
+    "linesDeleted": 0,
+    "codeLinesChanged": 4,
+    "ignoredFiles": 8
+  },
+  "recommendedRule": "Use git diff --numstat for tracked files plus git ls-files --others --exclude-standard for untracked files; do not modify the user's index in production.",
+  "expected": {
+    "counted": [
+      "src/app.ts",
+      "docs/readme.md"
+    ],
+    "ignored": [
+      "package-lock.json",
+      "pnpm-lock.yaml",
+      "node_modules/a/index.js",
+      "dist/app.js",
+      "build/output.js",
+      "coverage/lcov.info",
+      "web/app.min.js",
+      "web/app.js.map"
+    ]
+  }
+}

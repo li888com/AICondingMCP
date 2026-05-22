@@ -1,0 +1,315 @@
+{
+  "tool": "claude",
+  "captureLevel": "A",
+  "logRoots": [
+    "C:\\Users\\00232924\\.claude",
+    "C:\\Users\\00232924\\.claude\\sessions",
+    "C:\\Users\\00232924\\.claude\\projects",
+    "C:\\Users\\00232924\\.claude\\projects\\c--Users-00232924-Desktop-mcp"
+  ],
+  "signals": {
+    "startSignal": "project JSONL user event",
+    "endSignal": "project JSONL assistant event with stop_reason and usage",
+    "tokenSource": "assistant.message.usage",
+    "hasTurnId": true,
+    "hasRequestIdOrMessageId": true
+  },
+  "activeSessions": [
+    {
+      "path": "C:\\Users\\00232924\\.claude\\sessions\\27720.json",
+      "pid": 27720,
+      "sessionId": "44fc7412-763a-4477-af11-657b1682412c",
+      "cwd": "c:\\Users\\00232924\\Desktop\\mcp",
+      "entrypoint": "claude-vscode",
+      "kind": "interactive",
+      "version": "2.1.145",
+      "startedAt": "2026-05-21T07:31:56.682000+00:00"
+    }
+  ],
+  "projectLogs": [
+    {
+      "path": "C:\\Users\\00232924\\.claude\\projects\\c--Users-00232924-Desktop-mcp\\035a7010-8346-43dc-852b-cda5b975a9fb.jsonl",
+      "bytes": 7182,
+      "modifiedAt": "2026-05-20T08:44:25.078901+00:00",
+      "parseError": null,
+      "eventTypes": {
+        "queue-operation": 2,
+        "user": 1,
+        "attachment": 3,
+        "file-history-snapshot": 1,
+        "assistant": 1
+      },
+      "assistantUsageEvents": 1
+    },
+    {
+      "path": "C:\\Users\\00232924\\.claude\\projects\\c--Users-00232924-Desktop-mcp\\3b93522b-8860-43b1-9eca-ff77d483721c.jsonl",
+      "bytes": 258289,
+      "modifiedAt": "2026-05-20T05:41:54.197244+00:00",
+      "parseError": null,
+      "eventTypes": {
+        "queue-operation": 14,
+        "user": 35,
+        "attachment": 8,
+        "file-history-snapshot": 7,
+        "assistant": 70,
+        "system": 70,
+        "ai-title": 8,
+        "last-prompt": 7
+      },
+      "assistantUsageEvents": 70
+    },
+    {
+      "path": "C:\\Users\\00232924\\.claude\\projects\\c--Users-00232924-Desktop-mcp\\3b93522b-8860-43b1-9eca-ff77d483721c\\subagents\\agent-adb38983b239c1676.jsonl",
+      "bytes": 650830,
+      "modifiedAt": "2026-05-20T04:16:03.447920+00:00",
+      "parseError": null,
+      "eventTypes": {
+        "user": 100,
+        "attachment": 1,
+        "assistant": 169
+      },
+      "assistantUsageEvents": 169
+    },
+    {
+      "path": "C:\\Users\\00232924\\.claude\\projects\\c--Users-00232924-Desktop-mcp\\36505833-0810-4298-b216-42a7eb7fc8bc.jsonl",
+      "bytes": 9614,
+      "modifiedAt": "2026-05-20T03:18:32.422427+00:00",
+      "parseError": null,
+      "eventTypes": {
+        "queue-operation": 4,
+        "user": 5,
+        "attachment": 2,
+        "file-history-snapshot": 2,
+        "system": 1
+      },
+      "assistantUsageEvents": 0
+    },
+    {
+      "path": "C:\\Users\\00232924\\.claude\\projects\\c--Users-00232924-Desktop-mcp\\5799816f-1ae4-4ec0-a87d-1b5ae3e2dae1.jsonl",
+      "bytes": 394017,
+      "modifiedAt": "2026-05-19T05:55:31.925607+00:00",
+      "parseError": null,
+      "eventTypes": {
+        "queue-operation": 8,
+        "user": 32,
+        "attachment": 6,
+        "file-history-snapshot": 7,
+        "ai-title": 9,
+        "assistant": 61,
+        "last-prompt": 7
+      },
+      "assistantUsageEvents": 61
+    },
+    {
+      "path": "C:\\Users\\00232924\\.claude\\projects\\c--Users-00232924-Desktop-mcp\\0224abdf-6d75-4a42-b835-4f833101137a.jsonl",
+      "bytes": 51848,
+      "modifiedAt": "2026-05-19T03:11:12.234525+00:00",
+      "parseError": null,
+      "eventTypes": {
+        "queue-operation": 2,
+        "user": 10,
+        "attachment": 2,
+        "file-history-snapshot": 2,
+        "ai-title": 3,
+        "assistant": 17,
+        "last-prompt": 2
+      },
+      "assistantUsageEvents": 17
+    },
+    {
+      "path": "C:\\Users\\00232924\\.claude\\projects\\c--Users-00232924-Desktop-mcp\\767ed662-6e38-4a0f-8d8a-0524e718c213.jsonl",
+      "bytes": 50372,
+      "modifiedAt": "2026-05-19T03:01:41.037189+00:00",
+      "parseError": null,
+      "eventTypes": {
+        "queue-operation": 6,
+        "user": 10,
+        "attachment": 2,
+        "file-history-snapshot": 3,
+        "assistant": 17,
+        "ai-title": 2,
+        "last-prompt": 1
+      },
+      "assistantUsageEvents": 17
+    }
+  ],
+  "recentUserEvents": [
+    {
+      "path": "C:\\Users\\00232924\\.claude\\projects\\c--Users-00232924-Desktop-mcp\\767ed662-6e38-4a0f-8d8a-0524e718c213.jsonl",
+      "uuid": "cc552b7e-946f-4348-ba95-940d77dffbd8",
+      "timestamp": "2026-05-19T03:01:25.233Z",
+      "sessionId": "767ed662-6e38-4a0f-8d8a-0524e718c213",
+      "promptId": "916c9416-102f-4142-baf1-547d615c6f15"
+    },
+    {
+      "path": "C:\\Users\\00232924\\.claude\\projects\\c--Users-00232924-Desktop-mcp\\767ed662-6e38-4a0f-8d8a-0524e718c213.jsonl",
+      "uuid": "dbe4b6cd-8f98-46cd-8dff-fe2cc73025bd",
+      "timestamp": "2026-05-19T03:01:25.237Z",
+      "sessionId": "767ed662-6e38-4a0f-8d8a-0524e718c213",
+      "promptId": "916c9416-102f-4142-baf1-547d615c6f15"
+    },
+    {
+      "path": "C:\\Users\\00232924\\.claude\\projects\\c--Users-00232924-Desktop-mcp\\767ed662-6e38-4a0f-8d8a-0524e718c213.jsonl",
+      "uuid": "0d847368-0d34-4e94-ab5d-58489b796a8d",
+      "timestamp": "2026-05-19T03:01:25.240Z",
+      "sessionId": "767ed662-6e38-4a0f-8d8a-0524e718c213",
+      "promptId": "916c9416-102f-4142-baf1-547d615c6f15"
+    },
+    {
+      "path": "C:\\Users\\00232924\\.claude\\projects\\c--Users-00232924-Desktop-mcp\\767ed662-6e38-4a0f-8d8a-0524e718c213.jsonl",
+      "uuid": "705d3e56-97d0-42a6-9c1a-8423087e9996",
+      "timestamp": "2026-05-19T03:01:29.664Z",
+      "sessionId": "767ed662-6e38-4a0f-8d8a-0524e718c213",
+      "promptId": "916c9416-102f-4142-baf1-547d615c6f15"
+    },
+    {
+      "path": "C:\\Users\\00232924\\.claude\\projects\\c--Users-00232924-Desktop-mcp\\767ed662-6e38-4a0f-8d8a-0524e718c213.jsonl",
+      "uuid": "d5704ca0-17a1-453d-8b67-1b0ac456fbdf",
+      "timestamp": "2026-05-19T03:01:29.686Z",
+      "sessionId": "767ed662-6e38-4a0f-8d8a-0524e718c213",
+      "promptId": "916c9416-102f-4142-baf1-547d615c6f15"
+    }
+  ],
+  "recentAssistantEvents": [
+    {
+      "path": "C:\\Users\\00232924\\.claude\\projects\\c--Users-00232924-Desktop-mcp\\767ed662-6e38-4a0f-8d8a-0524e718c213.jsonl",
+      "uuid": "6d6bed31-3a34-48eb-95b7-69982f10cb86",
+      "parentUuid": "e820fc34-96e6-48b9-a032-048802c40a3c",
+      "timestamp": "2026-05-19T03:01:17.089Z",
+      "sessionId": "767ed662-6e38-4a0f-8d8a-0524e718c213",
+      "messageId": "msg_ce833d34-4320-49d0-8f16-6e04f412a408",
+      "model": "deepseek-v4-pro",
+      "stopReason": "tool_use",
+      "inputTokens": 27372,
+      "outputTokens": 160,
+      "cacheCreationInputTokens": 0,
+      "cacheReadInputTokens": 0
+    },
+    {
+      "path": "C:\\Users\\00232924\\.claude\\projects\\c--Users-00232924-Desktop-mcp\\767ed662-6e38-4a0f-8d8a-0524e718c213.jsonl",
+      "uuid": "2b69c693-75bb-41ef-a5cc-66b6fba01fcb",
+      "parentUuid": "46a0a439-8364-4cad-8f2f-09deea1dd808",
+      "timestamp": "2026-05-19T03:01:22.639Z",
+      "sessionId": "767ed662-6e38-4a0f-8d8a-0524e718c213",
+      "messageId": "msg_c0a78f9f-315c-4d5a-9560-f8fc5f5ff778",
+      "model": "deepseek-v4-pro",
+      "stopReason": null,
+      "inputTokens": 56964,
+      "outputTokens": 0,
+      "cacheCreationInputTokens": null,
+      "cacheReadInputTokens": null
+    },
+    {
+      "path": "C:\\Users\\00232924\\.claude\\projects\\c--Users-00232924-Desktop-mcp\\767ed662-6e38-4a0f-8d8a-0524e718c213.jsonl",
+      "uuid": "e49f7c58-025f-4da9-aae8-cbaf19497cdf",
+      "parentUuid": "2b69c693-75bb-41ef-a5cc-66b6fba01fcb",
+      "timestamp": "2026-05-19T03:01:25.130Z",
+      "sessionId": "767ed662-6e38-4a0f-8d8a-0524e718c213",
+      "messageId": "msg_c0a78f9f-315c-4d5a-9560-f8fc5f5ff778",
+      "model": "deepseek-v4-pro",
+      "stopReason": "tool_use",
+      "inputTokens": 28651,
+      "outputTokens": 225,
+      "cacheCreationInputTokens": 0,
+      "cacheReadInputTokens": 0
+    },
+    {
+      "path": "C:\\Users\\00232924\\.claude\\projects\\c--Users-00232924-Desktop-mcp\\767ed662-6e38-4a0f-8d8a-0524e718c213.jsonl",
+      "uuid": "e033fcef-f2df-4b96-9b59-4ba7489ff5db",
+      "parentUuid": "e49f7c58-025f-4da9-aae8-cbaf19497cdf",
+      "timestamp": "2026-05-19T03:01:25.131Z",
+      "sessionId": "767ed662-6e38-4a0f-8d8a-0524e718c213",
+      "messageId": "msg_c0a78f9f-315c-4d5a-9560-f8fc5f5ff778",
+      "model": "deepseek-v4-pro",
+      "stopReason": "tool_use",
+      "inputTokens": 28651,
+      "outputTokens": 225,
+      "cacheCreationInputTokens": 0,
+      "cacheReadInputTokens": 0
+    },
+    {
+      "path": "C:\\Users\\00232924\\.claude\\projects\\c--Users-00232924-Desktop-mcp\\767ed662-6e38-4a0f-8d8a-0524e718c213.jsonl",
+      "uuid": "5f3de5a3-8d8a-4085-bd5f-5420930df118",
+      "parentUuid": "e033fcef-f2df-4b96-9b59-4ba7489ff5db",
+      "timestamp": "2026-05-19T03:01:25.131Z",
+      "sessionId": "767ed662-6e38-4a0f-8d8a-0524e718c213",
+      "messageId": "msg_c0a78f9f-315c-4d5a-9560-f8fc5f5ff778",
+      "model": "deepseek-v4-pro",
+      "stopReason": "tool_use",
+      "inputTokens": 28651,
+      "outputTokens": 225,
+      "cacheCreationInputTokens": 0,
+      "cacheReadInputTokens": 0
+    },
+    {
+      "path": "C:\\Users\\00232924\\.claude\\projects\\c--Users-00232924-Desktop-mcp\\767ed662-6e38-4a0f-8d8a-0524e718c213.jsonl",
+      "uuid": "6f38c870-facf-4283-93a0-fa8625751957",
+      "parentUuid": "0d847368-0d34-4e94-ab5d-58489b796a8d",
+      "timestamp": "2026-05-19T03:01:27.454Z",
+      "sessionId": "767ed662-6e38-4a0f-8d8a-0524e718c213",
+      "messageId": "msg_7c28e60b-f663-4b5f-8237-b903eba0a4e6",
+      "model": "deepseek-v4-pro",
+      "stopReason": null,
+      "inputTokens": 56964,
+      "outputTokens": 0,
+      "cacheCreationInputTokens": null,
+      "cacheReadInputTokens": null
+    },
+    {
+      "path": "C:\\Users\\00232924\\.claude\\projects\\c--Users-00232924-Desktop-mcp\\767ed662-6e38-4a0f-8d8a-0524e718c213.jsonl",
+      "uuid": "5de66c42-7702-482e-8540-2a9ce19c1474",
+      "parentUuid": "6f38c870-facf-4283-93a0-fa8625751957",
+      "timestamp": "2026-05-19T03:01:29.631Z",
+      "sessionId": "767ed662-6e38-4a0f-8d8a-0524e718c213",
+      "messageId": "msg_7c28e60b-f663-4b5f-8237-b903eba0a4e6",
+      "model": "deepseek-v4-pro",
+      "stopReason": "tool_use",
+      "inputTokens": 3087,
+      "outputTokens": 141,
+      "cacheCreationInputTokens": 0,
+      "cacheReadInputTokens": 27264
+    },
+    {
+      "path": "C:\\Users\\00232924\\.claude\\projects\\c--Users-00232924-Desktop-mcp\\767ed662-6e38-4a0f-8d8a-0524e718c213.jsonl",
+      "uuid": "78eab431-68d5-425d-ae32-0133d42185f5",
+      "parentUuid": "5de66c42-7702-482e-8540-2a9ce19c1474",
+      "timestamp": "2026-05-19T03:01:29.632Z",
+      "sessionId": "767ed662-6e38-4a0f-8d8a-0524e718c213",
+      "messageId": "msg_7c28e60b-f663-4b5f-8237-b903eba0a4e6",
+      "model": "deepseek-v4-pro",
+      "stopReason": "tool_use",
+      "inputTokens": 3087,
+      "outputTokens": 141,
+      "cacheCreationInputTokens": 0,
+      "cacheReadInputTokens": 27264
+    },
+    {
+      "path": "C:\\Users\\00232924\\.claude\\projects\\c--Users-00232924-Desktop-mcp\\767ed662-6e38-4a0f-8d8a-0524e718c213.jsonl",
+      "uuid": "e2c283bf-e1ef-4467-9ca6-afb1c9e60178",
+      "parentUuid": "438f83c1-6144-47d0-a21a-ccbcd7aea23c",
+      "timestamp": "2026-05-19T03:01:34.323Z",
+      "sessionId": "767ed662-6e38-4a0f-8d8a-0524e718c213",
+      "messageId": "msg_32a6290d-cd79-47bc-a2e0-af24da07c849",
+      "model": "deepseek-v4-pro",
+      "stopReason": null,
+      "inputTokens": 56964,
+      "outputTokens": 0,
+      "cacheCreationInputTokens": null,
+      "cacheReadInputTokens": null
+    },
+    {
+      "path": "C:\\Users\\00232924\\.claude\\projects\\c--Users-00232924-Desktop-mcp\\767ed662-6e38-4a0f-8d8a-0524e718c213.jsonl",
+      "uuid": "e9c57b62-773e-449e-99b7-cc034368fddf",
+      "parentUuid": "e2c283bf-e1ef-4467-9ca6-afb1c9e60178",
+      "timestamp": "2026-05-19T03:01:40.909Z",
+      "sessionId": "767ed662-6e38-4a0f-8d8a-0524e718c213",
+      "messageId": "msg_32a6290d-cd79-47bc-a2e0-af24da07c849",
+      "model": "deepseek-v4-pro",
+      "stopReason": "end_turn",
+      "inputTokens": 629,
+      "outputTokens": 584,
+      "cacheCreationInputTokens": 0,
+      "cacheReadInputTokens": 30336
+    }
+  ]
+}

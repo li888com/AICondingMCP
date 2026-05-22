@@ -1,0 +1,12 @@
+{
+  "apiBaseUrl": "http://127.0.0.1:9906",
+  "reportApiBaseUrl": "http://127.0.0.1:9906",
+  "turnApiPath": "/ai-codingTurns",
+  "employeeId": "your-employee-id",
+  "userName": "your-name",
+  "teamId": "your-team-id",
+  "token": "",
+  "accessToken": "",
+  "externalSysKey": "",
+  "externalSysSecret": ""
+}

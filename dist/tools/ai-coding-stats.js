@@ -1,8 +1,37 @@
 import { z } from "zod";
 import { createCodeSnapshot, getCodeStatsSinceSnapshot, getWorkspaceCodeStats, loadRoundBaseline, saveRoundBaseline, } from "../code-stats.js";
-import { recordRound, recordRoundRevert } from "../database.js";
+import { recordDialogueTokenUsage, recordRound, recordRoundRevert } from "../database.js";
 const nonNegativeInteger = z.number().int().nonnegative();
 export function registerAiCodingStatsTools(server, hooks = {}) {
+    server.tool("record_dialogue_token_usage", "Record token usage for any dialogue turn, including turns that did not change code and therefore do not have an AI Coding round.", {
+        conversationId: z.string().min(1).describe("Stable id for the AI conversation/thread."),
+        roundId: z.number().int().positive().optional().describe("AI Coding round id to bind this token usage to. If omitted, the result reminds the caller to bind a project."),
+        client: z.enum(["codex", "claude-code"]).optional().describe("AI coding client. Defaults to codex."),
+        sourcePath: z.string().optional().describe("Source log path or logical source. Defaults to this MCP tool."),
+        sourceEventId: z.string().optional().describe("Stable source event id for idempotency when available."),
+        turnId: z.string().optional().describe("Stable turn id when available."),
+        modelName: z.string().optional().describe("AI model name used in this dialogue turn."),
+        startedAt: z.string().datetime().optional().describe("Dialogue start time, ISO 8601."),
+        endedAt: z.string().datetime().optional().describe("Dialogue end time, ISO 8601. Defaults to now."),
+        inputTokens: nonNegativeInteger.optional().describe("Consumed input tokens."),
+        outputTokens: nonNegativeInteger.optional().describe("Consumed output tokens."),
+        totalTokens: nonNegativeInteger
+            .optional()
+            .describe("Total consumed tokens. Defaults to inputTokens + outputTokens."),
+        promptText: z.string().optional().describe("User prompt text for this turn, if available."),
+        metadata: z.record(z.unknown()).optional().describe("Optional extra structured data.")
+    }, withLifecycle(hooks, async (input) => {
+        const recorded = await recordDialogueTokenUsage(input);
+        return {
+            content: [
+                {
+                    type: "text",
+                    text: JSON.stringify(recorded, null, 2)
+                }
+            ],
+            structuredContent: recorded
+        };
+    }));
     server.tool("begin_ai_coding_round", "Capture a Git workspace baseline at the start of an AI Coding round. record_ai_coding_round can later use this baseline to compute per-round code line stats.", {
         conversationId: z.string().min(1).describe("Stable id for the AI Coding conversation/thread."),
         projectPath: z.string().min(1).describe("Absolute Git workspace path."),

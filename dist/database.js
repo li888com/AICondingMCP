@@ -74,6 +74,67 @@ export async function recordRound(input) {
         totalTokens: round.totalTokens,
     };
 }
+export async function recordDialogueTokenUsage(input) {
+    validateDialogueTokenUsageInput(input);
+    const conversationId = normalizeConversationId(input.conversationId);
+    const metadata = normalizeMetadata(input.metadata, conversationId);
+    const now = new Date().toISOString();
+    let conversation = await localStorage.getConversation(conversationId);
+    if (!conversation) {
+        conversation = {
+            conversationId,
+            currentRequirementId: null,
+            lastRoundId: null,
+            firstSeenAt: now,
+            lastSeenAt: now,
+        };
+    }
+    else {
+        conversation.lastSeenAt = now;
+    }
+    const roundId = input.roundId ?? null;
+    if (roundId !== null) {
+        const round = await localStorage.getRound(roundId);
+        if (!round || round.conversationId !== conversationId) {
+            throw new Error(`Round ${roundId} not found or does not belong to this conversation`);
+        }
+    }
+    await localStorage.saveConversation(conversation);
+    const totalTokens = input.totalTokens ?? (input.inputTokens ?? 0) + (input.outputTokens ?? 0);
+    const warning = roundId === null ? "No roundId was provided. Please bind this dialogue to a project/AI Coding round." : null;
+    const event = await localStorage.createTokenUsageEvent({
+        roundId,
+        client: input.client ?? "codex",
+        sourcePath: input.sourcePath?.trim() || "mcp:record_dialogue_token_usage",
+        sourceEventId: input.sourceEventId?.trim() || null,
+        conversationId,
+        turnId: input.turnId?.trim() || null,
+        modelName: input.modelName?.trim() || null,
+        startedAt: input.startedAt ?? null,
+        endedAt: input.endedAt ?? now,
+        inputTokens: input.inputTokens ?? 0,
+        outputTokens: input.outputTokens ?? 0,
+        totalTokens,
+        matchQuality: totalTokens > 0 ? "mcp_payload" : null,
+        rawEvent: {
+            ...(metadata ? { metadata } : {}),
+            ...(input.promptText !== undefined ? { promptText: input.promptText } : {}),
+            tokenStatsSource: totalTokens > 0 ? "mcp_payload" : "unavailable",
+            needsProjectBinding: roundId === null,
+            warning,
+        },
+    });
+    return {
+        id: event.id,
+        conversationId: event.conversationId ?? conversationId,
+        client: event.client,
+        turnId: event.turnId,
+        modelName: event.modelName,
+        totalTokens: event.totalTokens,
+        needsProjectBinding: event.roundId === null,
+        warning,
+    };
+}
 export async function recordRoundRevert(input) {
     validateRevertInput(input);
     const conversationId = normalizeConversationId(input.conversationId);
@@ -197,6 +258,30 @@ function validateInput(input) {
     }
     if (endedAt.getTime() < startedAt.getTime()) {
         throw new Error("endedAt must be greater than or equal to startedAt");
+    }
+}
+function validateDialogueTokenUsageInput(input) {
+    if (!input.conversationId.trim()) {
+        throw new Error("conversationId is required");
+    }
+    if (input.client !== undefined && input.client !== "codex" && input.client !== "claude-code") {
+        throw new Error("client must be codex or claude-code");
+    }
+    if (input.roundId !== undefined && (!Number.isSafeInteger(input.roundId) || input.roundId <= 0)) {
+        throw new Error("roundId must be a positive integer");
+    }
+    if (input.startedAt !== undefined && Number.isNaN(new Date(input.startedAt).getTime())) {
+        throw new Error("startedAt must be a valid date-time string");
+    }
+    if (input.endedAt !== undefined && Number.isNaN(new Date(input.endedAt).getTime())) {
+        throw new Error("endedAt must be a valid date-time string");
+    }
+    if (input.startedAt !== undefined && input.endedAt !== undefined) {
+        const startedAt = new Date(input.startedAt);
+        const endedAt = new Date(input.endedAt);
+        if (endedAt.getTime() < startedAt.getTime()) {
+            throw new Error("endedAt must be greater than or equal to startedAt");
+        }
     }
 }
 function validateRevertInput(input) {

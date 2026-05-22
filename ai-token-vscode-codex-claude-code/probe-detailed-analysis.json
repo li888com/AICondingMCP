@@ -1,0 +1,724 @@
+{
+  "codex": {
+    "tokenEventCountRaw": 11,
+    "tokenEventCountDedupBySignature": 7,
+    "turnTokenCandidateCount": 5,
+    "completedWithoutTurnCount": 6,
+    "delaySeconds": {
+      "sampleCount": 11,
+      "min": -0.856,
+      "max": 237.185,
+      "avg": 89.665
+    },
+    "dedupRuleRecommended": "dedupe by conversationId + turnId + eventTimestamp + token counts; prefer rows with turnId, otherwise fallback to response.completed rows by conversationId + eventTimestamp + token counts",
+    "toolOrFileChangeSignal": {
+      "toolEventCount": 372,
+      "availableSignals": [
+        "codex.tool_result",
+        "response.custom_tool_call_input.done"
+      ],
+      "note": "Can observe tool calls and apply_patch input; exact file landing should still be confirmed by Git diff snapshot at turn end."
+    },
+    "dedupSamples": [
+      {
+        "signature": {
+          "conversationId": "019e4870-c874-7683-b2aa-ede54c940096",
+          "turnId": "019e4a00-7a56-7963-b89b-1883830b558d",
+          "eventTimestamp": "2026-05-21T10:04:53.365Z",
+          "inputTokens": null,
+          "outputTokens": 3640,
+          "cachedTokens": 163200,
+          "reasoningTokens": 400,
+          "toolTokens": null
+        },
+        "duplicates": 1,
+        "targets": [
+          "codex_client::transport"
+        ],
+        "logIds": [
+          3358760
+        ]
+      },
+      {
+        "signature": {
+          "conversationId": "019e4870-c874-7683-b2aa-ede54c940096",
+          "turnId": "019e4a00-7a56-7963-b89b-1883830b558d",
+          "eventTimestamp": "2026-05-21T10:04:53.365Z",
+          "inputTokens": 193456,
+          "outputTokens": 3640,
+          "cachedTokens": 163200,
+          "reasoningTokens": 400,
+          "toolTokens": null
+        },
+        "duplicates": 1,
+        "targets": [
+          "codex_client::transport"
+        ],
+        "logIds": [
+          3352230
+        ]
+      },
+      {
+        "signature": {
+          "conversationId": "019e4870-c874-7683-b2aa-ede54c940096",
+          "turnId": "019e4a00-7a56-7963-b89b-1883830b558d",
+          "eventTimestamp": "2026-05-21T10:02:47.815Z",
+          "inputTokens": 142327,
+          "outputTokens": 549,
+          "cachedTokens": 141696,
+          "reasoningTokens": 82,
+          "toolTokens": 142876
+        },
+        "duplicates": 1,
+        "targets": [
+          "codex_client::transport"
+        ],
+        "logIds": [
+          3351892
+        ]
+      },
+      {
+        "signature": {
+          "conversationId": "019e4870-c874-7683-b2aa-ede54c940096",
+          "turnId": "019e49fb-ef31-7923-b599-522eedf285fe",
+          "eventTimestamp": "2026-05-21T10:02:47.815Z",
+          "inputTokens": 142327,
+          "outputTokens": 549,
+          "cachedTokens": 141696,
+          "reasoningTokens": 82,
+          "toolTokens": 142876
+        },
+        "duplicates": 2,
+        "targets": [
+          "codex_client::transport"
+        ],
+        "logIds": [
+          3350441,
+          3350102
+        ]
+      },
+      {
+        "signature": {
+          "conversationId": "019e4992-63eb-7a71-9a57-4785f1c8116b",
+          "turnId": null,
+          "eventTimestamp": "2026-05-21T08:06:34.856Z",
+          "inputTokens": 5552,
+          "outputTokens": 55,
+          "cachedTokens": 2048,
+          "reasoningTokens": 39,
+          "toolTokens": 5607
+        },
+        "duplicates": 2,
+        "targets": [
+          "codex_otel.log_only",
+          "codex_otel.trace_safe"
+        ],
+        "logIds": [
+          3227730,
+          3227729
+        ]
+      },
+      {
+        "signature": {
+          "conversationId": "019e4870-c874-7683-b2aa-ede54c940096",
+          "turnId": null,
+          "eventTimestamp": "2026-05-21T07:22:27.298Z",
+          "inputTokens": 40302,
+          "outputTokens": 209,
+          "cachedTokens": 36224,
+          "reasoningTokens": 0,
+          "toolTokens": 40511
+        },
+        "duplicates": 2,
+        "targets": [
+          "codex_otel.log_only",
+          "codex_otel.trace_safe"
+        ],
+        "logIds": [
+          3216847,
+          3216846
+        ]
+      },
+      {
+        "signature": {
+          "conversationId": "019e4870-c874-7683-b2aa-ede54c940096",
+          "turnId": null,
+          "eventTimestamp": "2026-05-21T07:22:20.101Z",
+          "inputTokens": 36493,
+          "outputTokens": 3874,
+          "cachedTokens": 35712,
+          "reasoningTokens": 106,
+          "toolTokens": 40367
+        },
+        "duplicates": 2,
+        "targets": [
+          "codex_otel.log_only",
+          "codex_otel.trace_safe"
+        ],
+        "logIds": [
+          3216181,
+          3216180
+        ]
+      }
+    ]
+  },
+  "claude": {
+    "filesAnalyzed": 7,
+    "turnSamples": [
+      {
+        "file": "C:\\Users\\00232924\\.claude\\projects\\c--Users-00232924-Desktop-mcp\\035a7010-8346-43dc-852b-cda5b975a9fb.jsonl",
+        "sessionId": "035a7010-8346-43dc-852b-cda5b975a9fb",
+        "promptId": "89c702fc-aa18-4f8f-887d-e8a4327ff059",
+        "start": "2026-05-20T08:44:24.927Z",
+        "assistantRawCount": 1,
+        "assistantUniqueMessageCount": 1,
+        "hasEndTurn": true,
+        "finalStopReason": "stop_sequence",
+        "tokenSumByUniqueMessages": {
+          "inputTokens": 0,
+          "outputTokens": 0,
+          "cacheCreationInputTokens": 0,
+          "cacheReadInputTokens": 0
+        }
+      },
+      {
+        "file": "C:\\Users\\00232924\\.claude\\projects\\c--Users-00232924-Desktop-mcp\\3b93522b-8860-43b1-9eca-ff77d483721c.jsonl",
+        "sessionId": "3b93522b-8860-43b1-9eca-ff77d483721c",
+        "promptId": "077fdaa2-3268-4780-a200-db9ef5d1dd1a",
+        "start": "2026-05-20T03:18:45.934Z",
+        "assistantRawCount": 0,
+        "assistantUniqueMessageCount": 0,
+        "hasEndTurn": false,
+        "finalStopReason": null,
+        "tokenSumByUniqueMessages": {
+          "inputTokens": 0,
+          "outputTokens": 0,
+          "cacheCreationInputTokens": 0,
+          "cacheReadInputTokens": 0
+        }
+      },
+      {
+        "file": "C:\\Users\\00232924\\.claude\\projects\\c--Users-00232924-Desktop-mcp\\3b93522b-8860-43b1-9eca-ff77d483721c.jsonl",
+        "sessionId": "3b93522b-8860-43b1-9eca-ff77d483721c",
+        "promptId": "077fdaa2-3268-4780-a200-db9ef5d1dd1a",
+        "start": "2026-05-20T03:18:45.934Z",
+        "assistantRawCount": 1,
+        "assistantUniqueMessageCount": 1,
+        "hasEndTurn": true,
+        "finalStopReason": "stop_sequence",
+        "tokenSumByUniqueMessages": {
+          "inputTokens": 0,
+          "outputTokens": 0,
+          "cacheCreationInputTokens": 0,
+          "cacheReadInputTokens": 0
+        }
+      },
+      {
+        "file": "C:\\Users\\00232924\\.claude\\projects\\c--Users-00232924-Desktop-mcp\\3b93522b-8860-43b1-9eca-ff77d483721c.jsonl",
+        "sessionId": "3b93522b-8860-43b1-9eca-ff77d483721c",
+        "promptId": "8873de81-aef6-4315-a65b-79f9743e8469",
+        "start": "2026-05-20T03:25:53.436Z",
+        "assistantRawCount": 0,
+        "assistantUniqueMessageCount": 0,
+        "hasEndTurn": false,
+        "finalStopReason": null,
+        "tokenSumByUniqueMessages": {
+          "inputTokens": 0,
+          "outputTokens": 0,
+          "cacheCreationInputTokens": 0,
+          "cacheReadInputTokens": 0
+        }
+      },
+      {
+        "file": "C:\\Users\\00232924\\.claude\\projects\\c--Users-00232924-Desktop-mcp\\3b93522b-8860-43b1-9eca-ff77d483721c.jsonl",
+        "sessionId": "3b93522b-8860-43b1-9eca-ff77d483721c",
+        "promptId": "8873de81-aef6-4315-a65b-79f9743e8469",
+        "start": "2026-05-20T03:25:53.436Z",
+        "assistantRawCount": 2,
+        "assistantUniqueMessageCount": 1,
+        "hasEndTurn": true,
+        "finalStopReason": "end_turn",
+        "tokenSumByUniqueMessages": {
+          "inputTokens": 33102,
+          "outputTokens": 73,
+          "cacheCreationInputTokens": 0,
+          "cacheReadInputTokens": 0
+        }
+      },
+      {
+        "file": "C:\\Users\\00232924\\.claude\\projects\\c--Users-00232924-Desktop-mcp\\3b93522b-8860-43b1-9eca-ff77d483721c.jsonl",
+        "sessionId": "3b93522b-8860-43b1-9eca-ff77d483721c",
+        "promptId": "bb1bf079-7586-466b-ae80-dcf75f5fefde",
+        "start": "2026-05-20T03:26:18.947Z",
+        "assistantRawCount": 3,
+        "assistantUniqueMessageCount": 1,
+        "hasEndTurn": false,
+        "finalStopReason": "tool_use",
+        "tokenSumByUniqueMessages": {
+          "inputTokens": 33230,
+          "outputTokens": 141,
+          "cacheCreationInputTokens": 0,
+          "cacheReadInputTokens": 0
+        }
+      },
+      {
+        "file": "C:\\Users\\00232924\\.claude\\projects\\c--Users-00232924-Desktop-mcp\\3b93522b-8860-43b1-9eca-ff77d483721c.jsonl",
+        "sessionId": "3b93522b-8860-43b1-9eca-ff77d483721c",
+        "promptId": "bb1bf079-7586-466b-ae80-dcf75f5fefde",
+        "start": "2026-05-20T03:29:06.347Z",
+        "assistantRawCount": 3,
+        "assistantUniqueMessageCount": 1,
+        "hasEndTurn": false,
+        "finalStopReason": "tool_use",
+        "tokenSumByUniqueMessages": {
+          "inputTokens": 33383,
+          "outputTokens": 148,
+          "cacheCreationInputTokens": 0,
+          "cacheReadInputTokens": 0
+        }
+      },
+      {
+        "file": "C:\\Users\\00232924\\.claude\\projects\\c--Users-00232924-Desktop-mcp\\3b93522b-8860-43b1-9eca-ff77d483721c.jsonl",
+        "sessionId": "3b93522b-8860-43b1-9eca-ff77d483721c",
+        "promptId": "bb1bf079-7586-466b-ae80-dcf75f5fefde",
+        "start": "2026-05-20T03:29:53.360Z",
+        "assistantRawCount": 3,
+        "assistantUniqueMessageCount": 1,
+        "hasEndTurn": false,
+        "finalStopReason": "tool_use",
+        "tokenSumByUniqueMessages": {
+          "inputTokens": 33957,
+          "outputTokens": 583,
+          "cacheCreationInputTokens": 0,
+          "cacheReadInputTokens": 0
+        }
+      },
+      {
+        "file": "C:\\Users\\00232924\\.claude\\projects\\c--Users-00232924-Desktop-mcp\\3b93522b-8860-43b1-9eca-ff77d483721c.jsonl",
+        "sessionId": "3b93522b-8860-43b1-9eca-ff77d483721c",
+        "promptId": "bb1bf079-7586-466b-ae80-dcf75f5fefde",
+        "start": "2026-05-20T03:31:08.937Z",
+        "assistantRawCount": 2,
+        "assistantUniqueMessageCount": 1,
+        "hasEndTurn": true,
+        "finalStopReason": "end_turn",
+        "tokenSumByUniqueMessages": {
+          "inputTokens": 34611,
+          "outputTokens": 113,
+          "cacheCreationInputTokens": 0,
+          "cacheReadInputTokens": 0
+        }
+      },
+      {
+        "file": "C:\\Users\\00232924\\.claude\\projects\\c--Users-00232924-Desktop-mcp\\3b93522b-8860-43b1-9eca-ff77d483721c.jsonl",
+        "sessionId": "3b93522b-8860-43b1-9eca-ff77d483721c",
+        "promptId": "829eb92c-f612-4a4f-9b49-ab877db9d26b",
+        "start": "2026-05-20T03:34:16.393Z",
+        "assistantRawCount": 2,
+        "assistantUniqueMessageCount": 1,
+        "hasEndTurn": true,
+        "finalStopReason": "end_turn",
+        "tokenSumByUniqueMessages": {
+          "inputTokens": 34740,
+          "outputTokens": 397,
+          "cacheCreationInputTokens": 0,
+          "cacheReadInputTokens": 0
+        }
+      },
+      {
+        "file": "C:\\Users\\00232924\\.claude\\projects\\c--Users-00232924-Desktop-mcp\\3b93522b-8860-43b1-9eca-ff77d483721c.jsonl",
+        "sessionId": "3b93522b-8860-43b1-9eca-ff77d483721c",
+        "promptId": "9f20c1fa-48f0-4108-b87f-6384154d17fe",
+        "start": "2026-05-20T03:35:36.511Z",
+        "assistantRawCount": 3,
+        "assistantUniqueMessageCount": 1,
+        "hasEndTurn": false,
+        "finalStopReason": "tool_use",
+        "tokenSumByUniqueMessages": {
+          "inputTokens": 35236,
+          "outputTokens": 457,
+          "cacheCreationInputTokens": 0,
+          "cacheReadInputTokens": 0
+        }
+      },
+      {
+        "file": "C:\\Users\\00232924\\.claude\\projects\\c--Users-00232924-Desktop-mcp\\3b93522b-8860-43b1-9eca-ff77d483721c\\subagents\\agent-adb38983b239c1676.jsonl",
+        "sessionId": "3b93522b-8860-43b1-9eca-ff77d483721c",
+        "promptId": "9f20c1fa-48f0-4108-b87f-6384154d17fe",
+        "start": "2026-05-20T03:36:07.185Z",
+        "assistantRawCount": 3,
+        "assistantUniqueMessageCount": 1,
+        "hasEndTurn": false,
+        "finalStopReason": null,
+        "tokenSumByUniqueMessages": {
+          "inputTokens": 0,
+          "outputTokens": 0,
+          "cacheCreationInputTokens": 0,
+          "cacheReadInputTokens": 0
+        }
+      },
+      {
+        "file": "C:\\Users\\00232924\\.claude\\projects\\c--Users-00232924-Desktop-mcp\\3b93522b-8860-43b1-9eca-ff77d483721c\\subagents\\agent-adb38983b239c1676.jsonl",
+        "sessionId": "3b93522b-8860-43b1-9eca-ff77d483721c",
+        "promptId": "9f20c1fa-48f0-4108-b87f-6384154d17fe",
+        "start": "2026-05-20T03:38:43.879Z",
+        "assistantRawCount": 1,
+        "assistantUniqueMessageCount": 1,
+        "hasEndTurn": false,
+        "finalStopReason": null,
+        "tokenSumByUniqueMessages": {
+          "inputTokens": 0,
+          "outputTokens": 0,
+          "cacheCreationInputTokens": 0,
+          "cacheReadInputTokens": 0
+        }
+      },
+      {
+        "file": "C:\\Users\\00232924\\.claude\\projects\\c--Users-00232924-Desktop-mcp\\3b93522b-8860-43b1-9eca-ff77d483721c\\subagents\\agent-adb38983b239c1676.jsonl",
+        "sessionId": "3b93522b-8860-43b1-9eca-ff77d483721c",
+        "promptId": "9f20c1fa-48f0-4108-b87f-6384154d17fe",
+        "start": "2026-05-20T03:38:48.593Z",
+        "assistantRawCount": 1,
+        "assistantUniqueMessageCount": 1,
+        "hasEndTurn": false,
+        "finalStopReason": null,
+        "tokenSumByUniqueMessages": {
+          "inputTokens": 0,
+          "outputTokens": 0,
+          "cacheCreationInputTokens": 0,
+          "cacheReadInputTokens": 0
+        }
+      },
+      {
+        "file": "C:\\Users\\00232924\\.claude\\projects\\c--Users-00232924-Desktop-mcp\\3b93522b-8860-43b1-9eca-ff77d483721c\\subagents\\agent-adb38983b239c1676.jsonl",
+        "sessionId": "3b93522b-8860-43b1-9eca-ff77d483721c",
+        "promptId": "9f20c1fa-48f0-4108-b87f-6384154d17fe",
+        "start": "2026-05-20T03:38:51.338Z",
+        "assistantRawCount": 1,
+        "assistantUniqueMessageCount": 1,
+        "hasEndTurn": false,
+        "finalStopReason": null,
+        "tokenSumByUniqueMessages": {
+          "inputTokens": 0,
+          "outputTokens": 0,
+          "cacheCreationInputTokens": 0,
+          "cacheReadInputTokens": 0
+        }
+      },
+      {
+        "file": "C:\\Users\\00232924\\.claude\\projects\\c--Users-00232924-Desktop-mcp\\3b93522b-8860-43b1-9eca-ff77d483721c\\subagents\\agent-adb38983b239c1676.jsonl",
+        "sessionId": "3b93522b-8860-43b1-9eca-ff77d483721c",
+        "promptId": "9f20c1fa-48f0-4108-b87f-6384154d17fe",
+        "start": "2026-05-20T03:38:54.929Z",
+        "assistantRawCount": 1,
+        "assistantUniqueMessageCount": 1,
+        "hasEndTurn": false,
+        "finalStopReason": null,
+        "tokenSumByUniqueMessages": {
+          "inputTokens": 0,
+          "outputTokens": 0,
+          "cacheCreationInputTokens": 0,
+          "cacheReadInputTokens": 0
+        }
+      },
+      {
+        "file": "C:\\Users\\00232924\\.claude\\projects\\c--Users-00232924-Desktop-mcp\\3b93522b-8860-43b1-9eca-ff77d483721c\\subagents\\agent-adb38983b239c1676.jsonl",
+        "sessionId": "3b93522b-8860-43b1-9eca-ff77d483721c",
+        "promptId": "9f20c1fa-48f0-4108-b87f-6384154d17fe",
+        "start": "2026-05-20T03:38:58.500Z",
+        "assistantRawCount": 1,
+        "assistantUniqueMessageCount": 1,
+        "hasEndTurn": false,
+        "finalStopReason": null,
+        "tokenSumByUniqueMessages": {
+          "inputTokens": 0,
+          "outputTokens": 0,
+          "cacheCreationInputTokens": 0,
+          "cacheReadInputTokens": 0
+        }
+      },
+      {
+        "file": "C:\\Users\\00232924\\.claude\\projects\\c--Users-00232924-Desktop-mcp\\3b93522b-8860-43b1-9eca-ff77d483721c\\subagents\\agent-adb38983b239c1676.jsonl",
+        "sessionId": "3b93522b-8860-43b1-9eca-ff77d483721c",
+        "promptId": "9f20c1fa-48f0-4108-b87f-6384154d17fe",
+        "start": "2026-05-20T03:39:02.486Z",
+        "assistantRawCount": 1,
+        "assistantUniqueMessageCount": 1,
+        "hasEndTurn": false,
+        "finalStopReason": "tool_use",
+        "tokenSumByUniqueMessages": {
+          "inputTokens": 18892,
+          "outputTokens": 751,
+          "cacheCreationInputTokens": 0,
+          "cacheReadInputTokens": 0
+        }
+      },
+      {
+        "file": "C:\\Users\\00232924\\.claude\\projects\\c--Users-00232924-Desktop-mcp\\3b93522b-8860-43b1-9eca-ff77d483721c\\subagents\\agent-adb38983b239c1676.jsonl",
+        "sessionId": "3b93522b-8860-43b1-9eca-ff77d483721c",
+        "promptId": "9f20c1fa-48f0-4108-b87f-6384154d17fe",
+        "start": "2026-05-20T03:39:06.328Z",
+        "assistantRawCount": 7,
+        "assistantUniqueMessageCount": 1,
+        "hasEndTurn": false,
+        "finalStopReason": null,
+        "tokenSumByUniqueMessages": {
+          "inputTokens": 0,
+          "outputTokens": 0,
+          "cacheCreationInputTokens": 0,
+          "cacheReadInputTokens": 0
+        }
+      },
+      {
+        "file": "C:\\Users\\00232924\\.claude\\projects\\c--Users-00232924-Desktop-mcp\\3b93522b-8860-43b1-9eca-ff77d483721c\\subagents\\agent-adb38983b239c1676.jsonl",
+        "sessionId": "3b93522b-8860-43b1-9eca-ff77d483721c",
+        "promptId": "9f20c1fa-48f0-4108-b87f-6384154d17fe",
+        "start": "2026-05-20T03:39:46.236Z",
+        "assistantRawCount": 0,
+        "assistantUniqueMessageCount": 0,
+        "hasEndTurn": false,
+        "finalStopReason": null,
+        "tokenSumByUniqueMessages": {
+          "inputTokens": 0,
+          "outputTokens": 0,
+          "cacheCreationInputTokens": 0,
+          "cacheReadInputTokens": 0
+        }
+      }
+    ],
+    "duplicateMessageGroupCount": 93,
+    "duplicateMessageSamples": [
+      {
+        "file": "C:\\Users\\00232924\\.claude\\projects\\c--Users-00232924-Desktop-mcp\\3b93522b-8860-43b1-9eca-ff77d483721c.jsonl",
+        "messageId": "d346ce5bc25043cca37f49543d7d17b8",
+        "count": 2,
+        "first": "2026-05-20T03:26:03.082Z",
+        "last": "2026-05-20T03:26:05.082Z",
+        "stopReasons": [
+          "end_turn"
+        ],
+        "recommendedUsage": {
+          "uuid": "dd8c3e55-657e-46d8-b618-13b7200a2818",
+          "parentUuid": "13132159-c7e9-4d92-9736-8b8d133c6d98",
+          "timestamp": "2026-05-20T03:26:05.082Z",
+          "messageId": "d346ce5bc25043cca37f49543d7d17b8",
+          "stopReason": "end_turn",
+          "model": "deepseek-v4-pro",
+          "inputTokens": 33102,
+          "outputTokens": 73,
+          "cacheCreationInputTokens": 0,
+          "cacheReadInputTokens": 0
+        }
+      },
+      {
+        "file": "C:\\Users\\00232924\\.claude\\projects\\c--Users-00232924-Desktop-mcp\\3b93522b-8860-43b1-9eca-ff77d483721c.jsonl",
+        "messageId": "fd4d649519e34012b62a88103d3e9b41",
+        "count": 3,
+        "first": "2026-05-20T03:28:20.729Z",
+        "last": "2026-05-20T03:28:24.916Z",
+        "stopReasons": [
+          "tool_use"
+        ],
+        "recommendedUsage": {
+          "uuid": "66060c8c-3fdf-44cc-8737-b72f370805e2",
+          "parentUuid": "ab64e265-9654-434b-9020-01a059e5b754",
+          "timestamp": "2026-05-20T03:28:24.916Z",
+          "messageId": "fd4d649519e34012b62a88103d3e9b41",
+          "stopReason": "tool_use",
+          "model": "deepseek-v4-pro",
+          "inputTokens": 33230,
+          "outputTokens": 141,
+          "cacheCreationInputTokens": 0,
+          "cacheReadInputTokens": 0
+        }
+      },
+      {
+        "file": "C:\\Users\\00232924\\.claude\\projects\\c--Users-00232924-Desktop-mcp\\3b93522b-8860-43b1-9eca-ff77d483721c.jsonl",
+        "messageId": "93379003499f4cb9996122fb876aca9a",
+        "count": 3,
+        "first": "2026-05-20T03:29:39.692Z",
+        "last": "2026-05-20T03:29:42.309Z",
+        "stopReasons": [
+          "tool_use"
+        ],
+        "recommendedUsage": {
+          "uuid": "76b9e157-18da-4646-8aa7-c1a3804198ef",
+          "parentUuid": "052cdc0b-921b-404e-959e-60fee298b734",
+          "timestamp": "2026-05-20T03:29:42.309Z",
+          "messageId": "93379003499f4cb9996122fb876aca9a",
+          "stopReason": "tool_use",
+          "model": "deepseek-v4-pro",
+          "inputTokens": 33383,
+          "outputTokens": 148,
+          "cacheCreationInputTokens": 0,
+          "cacheReadInputTokens": 0
+        }
+      },
+      {
+        "file": "C:\\Users\\00232924\\.claude\\projects\\c--Users-00232924-Desktop-mcp\\3b93522b-8860-43b1-9eca-ff77d483721c.jsonl",
+        "messageId": "2e8e58dd8ec3474e98f978165246a764",
+        "count": 3,
+        "first": "2026-05-20T03:30:52.561Z",
+        "last": "2026-05-20T03:31:08.792Z",
+        "stopReasons": [
+          "tool_use"
+        ],
+        "recommendedUsage": {
+          "uuid": "d04b25ba-b79c-481c-994e-d44343c347e6",
+          "parentUuid": "33ed10a6-40ae-414c-8a89-a44d83937a56",
+          "timestamp": "2026-05-20T03:31:08.792Z",
+          "messageId": "2e8e58dd8ec3474e98f978165246a764",
+          "stopReason": "tool_use",
+          "model": "deepseek-v4-pro",
+          "inputTokens": 33957,
+          "outputTokens": 583,
+          "cacheCreationInputTokens": 0,
+          "cacheReadInputTokens": 0
+        }
+      },
+      {
+        "file": "C:\\Users\\00232924\\.claude\\projects\\c--Users-00232924-Desktop-mcp\\3b93522b-8860-43b1-9eca-ff77d483721c.jsonl",
+        "messageId": "2db4093cf8484d5d98a39605a99fcbbf",
+        "count": 2,
+        "first": "2026-05-20T03:33:07.202Z",
+        "last": "2026-05-20T03:33:10.266Z",
+        "stopReasons": [
+          "end_turn"
+        ],
+        "recommendedUsage": {
+          "uuid": "35bc99e8-861d-4528-bd87-f9a21e91b998",
+          "parentUuid": "1fb6f653-9669-4679-aede-02f6c1234e85",
+          "timestamp": "2026-05-20T03:33:10.266Z",
+          "messageId": "2db4093cf8484d5d98a39605a99fcbbf",
+          "stopReason": "end_turn",
+          "model": "deepseek-v4-pro",
+          "inputTokens": 34611,
+          "outputTokens": 113,
+          "cacheCreationInputTokens": 0,
+          "cacheReadInputTokens": 0
+        }
+      },
+      {
+        "file": "C:\\Users\\00232924\\.claude\\projects\\c--Users-00232924-Desktop-mcp\\3b93522b-8860-43b1-9eca-ff77d483721c.jsonl",
+        "messageId": "fcf8a96187dd44ba8a0db267c0b22fa9",
+        "count": 2,
+        "first": "2026-05-20T03:35:11.917Z",
+        "last": "2026-05-20T03:35:19.248Z",
+        "stopReasons": [
+          "end_turn"
+        ],
+        "recommendedUsage": {
+          "uuid": "5cdfa8e6-04a4-4176-a897-89813d5889de",
+          "parentUuid": "b56a0241-35ad-4943-8a86-ee9a5afa3dec",
+          "timestamp": "2026-05-20T03:35:19.248Z",
+          "messageId": "fcf8a96187dd44ba8a0db267c0b22fa9",
+          "stopReason": "end_turn",
+          "model": "deepseek-v4-pro",
+          "inputTokens": 34740,
+          "outputTokens": 397,
+          "cacheCreationInputTokens": 0,
+          "cacheReadInputTokens": 0
+        }
+      },
+      {
+        "file": "C:\\Users\\00232924\\.claude\\projects\\c--Users-00232924-Desktop-mcp\\3b93522b-8860-43b1-9eca-ff77d483721c.jsonl",
+        "messageId": "3be7145ff9e9496bb0bce359c11deb82",
+        "count": 3,
+        "first": "2026-05-20T03:35:54.554Z",
+        "last": "2026-05-20T03:36:07.170Z",
+        "stopReasons": [
+          "tool_use"
+        ],
+        "recommendedUsage": {
+          "uuid": "8ce0fef3-a253-4229-aa2c-791fca39f8c1",
+          "parentUuid": "0daa6895-5885-485f-b6b2-4351cbdf3a0f",
+          "timestamp": "2026-05-20T03:36:07.170Z",
+          "messageId": "3be7145ff9e9496bb0bce359c11deb82",
+          "stopReason": "tool_use",
+          "model": "deepseek-v4-pro",
+          "inputTokens": 35236,
+          "outputTokens": 457,
+          "cacheCreationInputTokens": 0,
+          "cacheReadInputTokens": 0
+        }
+      },
+      {
+        "file": "C:\\Users\\00232924\\.claude\\projects\\c--Users-00232924-Desktop-mcp\\3b93522b-8860-43b1-9eca-ff77d483721c.jsonl",
+        "messageId": "d5e7a8e3cd28459487106e19da82cc06",
+        "count": 4,
+        "first": "2026-05-20T04:16:25.467Z",
+        "last": "2026-05-20T04:16:33.078Z",
+        "stopReasons": [
+          "tool_use"
+        ],
+        "recommendedUsage": {
+          "uuid": "a32a779b-c442-436e-ab30-fa04cc852ac0",
+          "parentUuid": "f6cfb8a8-294d-4bf0-a456-0fb7467957ea",
+          "timestamp": "2026-05-20T04:16:33.078Z",
+          "messageId": "d5e7a8e3cd28459487106e19da82cc06",
+          "stopReason": "tool_use",
+          "model": "deepseek-v4-pro",
+          "inputTokens": 39004,
+          "outputTokens": 475,
+          "cacheCreationInputTokens": 0,
+          "cacheReadInputTokens": 0
+        }
+      },
+      {
+        "file": "C:\\Users\\00232924\\.claude\\projects\\c--Users-00232924-Desktop-mcp\\3b93522b-8860-43b1-9eca-ff77d483721c.jsonl",
+        "messageId": "0b6c1219c2c145b997b80905ad98a239",
+        "count": 4,
+        "first": "2026-05-20T04:17:29.366Z",
+        "last": "2026-05-20T04:17:38.635Z",
+        "stopReasons": [
+          "tool_use"
+        ],
+        "recommendedUsage": {
+          "uuid": "66854c1e-6964-4f3a-8c9d-a8b5d980e459",
+          "parentUuid": "66d28815-786f-4bd9-8cc5-5ebbaf18f70b",
+          "timestamp": "2026-05-20T04:17:38.635Z",
+          "messageId": "0b6c1219c2c145b997b80905ad98a239",
+          "stopReason": "tool_use",
+          "model": "deepseek-v4-pro",
+          "inputTokens": 39884,
+          "outputTokens": 530,
+          "cacheCreationInputTokens": 0,
+          "cacheReadInputTokens": 0
+        }
+      },
+      {
+        "file": "C:\\Users\\00232924\\.claude\\projects\\c--Users-00232924-Desktop-mcp\\3b93522b-8860-43b1-9eca-ff77d483721c.jsonl",
+        "messageId": "b3535f56f5d1490dbea024b3d6bbf182",
+        "count": 5,
+        "first": "2026-05-20T04:17:49.859Z",
+        "last": "2026-05-20T04:18:02.815Z",
+        "stopReasons": [
+          "tool_use"
+        ],
+        "recommendedUsage": {
+          "uuid": "45063c3c-b27e-44b7-aa45-f3f820c76edf",
+          "parentUuid": "98b6f6bf-0e61-4b35-b923-f23268f4021f",
+          "timestamp": "2026-05-20T04:18:02.815Z",
+          "messageId": "b3535f56f5d1490dbea024b3d6bbf182",
+          "stopReason": "tool_use",
+          "model": "deepseek-v4-pro",
+          "inputTokens": 40482,
+          "outputTokens": 453,
+          "cacheCreationInputTokens": 0,
+          "cacheReadInputTokens": 0
+        }
+      }
+    ],
+    "turnDurationSeconds": {
+      "sampleCount": 33,
+      "min": 0.065,
+      "max": 276.773,
+      "avg": 33.566
+    },
+    "aggregationRuleRecommended": "Within one user-to-next-user window, group assistant events by message.id, keep the latest event for each message.id, then sum usage across unique model calls. Treat end_turn/stop_sequence as final user-visible completion.",
+    "fileChangeSignal": {
+      "fileHistorySnapshotCount": 22,
+      "note": "file-history-snapshot exists, but code line statistics should still rely on Git baseline/final snapshot."
+    }
+  }
+}

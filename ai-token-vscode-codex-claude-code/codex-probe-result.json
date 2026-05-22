@@ -1,0 +1,439 @@
+{
+  "tool": "codex",
+  "captureLevel": "A",
+  "logRoots": [
+    "C:\\Users\\00232924\\.codex",
+    "C:\\Users\\00232924\\.codex\\sessions",
+    "C:\\Users\\00232924\\.codex\\logs_2.sqlite"
+  ],
+  "signals": {
+    "startSignal": "session JSONL task_started and SQLite turn.id context",
+    "endSignal": "SQLite response.completed event",
+    "tokenSource": "SQLite logs.feedback_log_body response.completed token counts",
+    "hasTurnId": true,
+    "hasRequestIdOrMessageId": true
+  },
+  "observations": {
+    "sqliteBusyFallbackNeeded": true,
+    "sqliteReadStrategy": "copy snapshot before reading",
+    "sessionCwds": [
+      "C:\\Users\\00232924\\Documents\\Codex\\2026-05-21\\ai-token-vscode-codex-claude-code",
+      "c:\\Users\\00232924\\Desktop\\mcp"
+    ],
+    "jsonlTurnIds": [
+      "019e4381-07a7-79d1-bbd8-941cd26d2913",
+      "019e4478-c7ff-72a0-b359-d9c07f9a4e07",
+      "019e44b1-ae7d-7972-9e59-9133f18f643c",
+      "019e486b-bdb0-7720-9340-57b86f1f97d4",
+      "019e486e-400b-7d40-ad1f-15a3874645a9",
+      "019e4873-ccb5-7883-b291-08b1dbb46915"
+    ]
+  },
+  "sessionFiles": [
+    {
+      "path": "C:\\Users\\00232924\\.codex\\sessions\\2026\\05\\21\\rollout-2026-05-21T10-50-11-019e4870-c874-7683-b2aa-ede54c940096.jsonl",
+      "bytes": 1327152,
+      "modifiedAt": "2026-05-21T10:05:07.330617+00:00",
+      "parseError": null,
+      "eventTypes": [
+        "event_msg",
+        "response_item",
+        "session_meta",
+        "turn_context"
+      ]
+    },
+    {
+      "path": "C:\\Users\\00232924\\.codex\\sessions\\2026\\05\\21\\rollout-2026-05-21T10-44-40-019e486b-ba20-73c1-bffc-730fbc3197c3.jsonl",
+      "bytes": 102710,
+      "modifiedAt": "2026-05-21T02:47:52.199352+00:00",
+      "parseError": null,
+      "eventTypes": [
+        "event_msg",
+        "response_item",
+        "session_meta",
+        "turn_context"
+      ]
+    },
+    {
+      "path": "C:\\Users\\00232924\\.codex\\sessions\\2026\\05\\20\\rollout-2026-05-20T17-21-19-019e44b0-829c-7a92-af91-5b1753514028.jsonl",
+      "bytes": 122594,
+      "modifiedAt": "2026-05-20T09:24:23.195197+00:00",
+      "parseError": null,
+      "eventTypes": [
+        "event_msg",
+        "response_item",
+        "session_meta",
+        "turn_context"
+      ]
+    },
+    {
+      "path": "C:\\Users\\00232924\\.codex\\sessions\\2026\\05\\20\\rollout-2026-05-20T16-19-59-019e4478-5c29-7812-a9bf-8f7ddd5f3d33.jsonl",
+      "bytes": 527901,
+      "modifiedAt": "2026-05-20T09:19:27.258765+00:00",
+      "parseError": null,
+      "eventTypes": [
+        "event_msg",
+        "response_item",
+        "session_meta",
+        "turn_context"
+      ]
+    },
+    {
+      "path": "C:\\Users\\00232924\\.codex\\sessions\\2026\\05\\20\\rollout-2026-05-20T11-45-38-019e437d-324e-7181-aaf0-ea602dccc5ef.jsonl",
+      "bytes": 2275387,
+      "modifiedAt": "2026-05-20T08:04:58.427092+00:00",
+      "parseError": null,
+      "eventTypes": [
+        "event_msg",
+        "response_item",
+        "session_meta",
+        "turn_context"
+      ]
+    }
+  ],
+  "sqlite": {
+    "path": "C:\\Users\\00232924\\.codex\\logs_2.sqlite",
+    "exists": true,
+    "readMode": "copied_snapshot",
+    "error": null,
+    "tables": [
+      "_sqlx_migrations",
+      "logs",
+      "sqlite_sequence"
+    ],
+    "recentCompletedEvents": [
+      {
+        "logId": 3346624,
+        "timestamp": "2026-05-21T10:04:53+00:00",
+        "level": "TRACE",
+        "target": "codex_client::transport",
+        "conversationId": "019e4870-c874-7683-b2aa-ede54c940096",
+        "model": "gpt-5.5",
+        "inputTokens": 142327,
+        "outputTokens": 549,
+        "cachedTokens": 141696,
+        "reasoningTokens": 82,
+        "toolTokens": 142876,
+        "eventTimestamp": "2026-05-21T10:02:47.815Z"
+      },
+      {
+        "logId": 3346615,
+        "timestamp": "2026-05-21T10:04:53+00:00",
+        "level": "INFO",
+        "target": "codex_otel.trace_safe",
+        "conversationId": "019e4870-c874-7683-b2aa-ede54c940096",
+        "model": "gpt-5.5",
+        "inputTokens": 193456,
+        "outputTokens": 3640,
+        "cachedTokens": 163200,
+        "reasoningTokens": 400,
+        "toolTokens": 197096,
+        "eventTimestamp": "2026-05-21T10:04:53.367Z"
+      },
+      {
+        "logId": 3346614,
+        "timestamp": "2026-05-21T10:04:53+00:00",
+        "level": "INFO",
+        "target": "codex_otel.log_only",
+        "conversationId": "019e4870-c874-7683-b2aa-ede54c940096",
+        "model": "gpt-5.5",
+        "inputTokens": 193456,
+        "outputTokens": 3640,
+        "cachedTokens": 163200,
+        "reasoningTokens": 400,
+        "toolTokens": 197096,
+        "eventTimestamp": "2026-05-21T10:04:53.367Z"
+      },
+      {
+        "logId": 3346612,
+        "timestamp": "2026-05-21T10:04:53+00:00",
+        "level": "TRACE",
+        "target": "codex_api::sse::responses",
+        "conversationId": null,
+        "model": null,
+        "inputTokens": null,
+        "outputTokens": null,
+        "cachedTokens": null,
+        "reasoningTokens": null,
+        "toolTokens": null,
+        "eventTimestamp": null
+      },
+      {
+        "logId": 3346610,
+        "timestamp": "2026-05-21T10:04:53+00:00",
+        "level": "INFO",
+        "target": "codex_otel.log_only",
+        "conversationId": "019e4870-c874-7683-b2aa-ede54c940096",
+        "model": "gpt-5.5",
+        "inputTokens": null,
+        "outputTokens": null,
+        "cachedTokens": null,
+        "reasoningTokens": null,
+        "toolTokens": null,
+        "eventTimestamp": "2026-05-21T10:04:53.365Z"
+      },
+      {
+        "logId": 3346607,
+        "timestamp": "2026-05-21T10:04:52+00:00",
+        "level": "INFO",
+        "target": "codex_otel.log_only",
+        "conversationId": "019e4870-c874-7683-b2aa-ede54c940096",
+        "model": "gpt-5.5",
+        "inputTokens": null,
+        "outputTokens": null,
+        "cachedTokens": null,
+        "reasoningTokens": null,
+        "toolTokens": null,
+        "eventTimestamp": "2026-05-21T10:04:52.847Z"
+      },
+      {
+        "logId": 3346601,
+        "timestamp": "2026-05-21T10:04:52+00:00",
+        "level": "INFO",
+        "target": "codex_core::stream_events_utils",
+        "conversationId": null,
+        "model": "gpt-5.5}:receiving_stream:handle_responses{codex.request.reasoning_effort=medium",
+        "inputTokens": null,
+        "outputTokens": null,
+        "cachedTokens": null,
+        "reasoningTokens": null,
+        "toolTokens": null,
+        "eventTimestamp": null
+      },
+      {
+        "logId": 3346600,
+        "timestamp": "2026-05-21T10:04:52+00:00",
+        "level": "TRACE",
+        "target": "codex_api::sse::responses",
+        "conversationId": null,
+        "model": null,
+        "inputTokens": null,
+        "outputTokens": null,
+        "cachedTokens": null,
+        "reasoningTokens": null,
+        "toolTokens": null,
+        "eventTimestamp": null
+      },
+      {
+        "logId": 3346597,
+        "timestamp": "2026-05-21T10:04:52+00:00",
+        "level": "TRACE",
+        "target": "codex_api::sse::responses",
+        "conversationId": null,
+        "model": null,
+        "inputTokens": null,
+        "outputTokens": null,
+        "cachedTokens": null,
+        "reasoningTokens": null,
+        "toolTokens": null,
+        "eventTimestamp": null
+      },
+      {
+        "logId": 3340184,
+        "timestamp": "2026-05-21T10:03:56+00:00",
+        "level": "DEBUG",
+        "target": "codex_core::stream_events_utils",
+        "conversationId": null,
+        "model": "gpt-5.5}:receiving_stream:handle_responses{codex.request.reasoning_effort=medium",
+        "inputTokens": null,
+        "outputTokens": null,
+        "cachedTokens": null,
+        "reasoningTokens": null,
+        "toolTokens": null,
+        "eventTimestamp": null
+      },
+      {
+        "logId": 3339888,
+        "timestamp": "2026-05-21T10:03:40+00:00",
+        "level": "TRACE",
+        "target": "codex_client::transport",
+        "conversationId": "019e4870-c874-7683-b2aa-ede54c940096",
+        "model": "gpt-5.5",
+        "inputTokens": 142327,
+        "outputTokens": 549,
+        "cachedTokens": 141696,
+        "reasoningTokens": 82,
+        "toolTokens": 142876,
+        "eventTimestamp": "2026-05-21T10:02:47.815Z"
+      },
+      {
+        "logId": 3339880,
+        "timestamp": "2026-05-21T10:03:40+00:00",
+        "level": "INFO",
+        "target": "codex_otel.log_only",
+        "conversationId": "019e4870-c874-7683-b2aa-ede54c940096",
+        "model": "gpt-5.5",
+        "inputTokens": null,
+        "outputTokens": null,
+        "cachedTokens": null,
+        "reasoningTokens": null,
+        "toolTokens": null,
+        "eventTimestamp": "2026-05-21T10:03:40.395Z"
+      },
+      {
+        "logId": 3339684,
+        "timestamp": "2026-05-21T10:03:39+00:00",
+        "level": "TRACE",
+        "target": "codex_core::spawn",
+        "conversationId": null,
+        "model": "gpt-5.5}:receiving_stream:handle_responses{codex.request.reasoning_effort=medium",
+        "inputTokens": null,
+        "outputTokens": null,
+        "cachedTokens": null,
+        "reasoningTokens": null,
+        "toolTokens": null,
+        "eventTimestamp": null
+      },
+      {
+        "logId": 3339671,
+        "timestamp": "2026-05-21T10:03:39+00:00",
+        "level": "INFO",
+        "target": "codex_core::stream_events_utils",
+        "conversationId": null,
+        "model": "gpt-5.5}:receiving_stream:handle_responses{codex.request.reasoning_effort=medium",
+        "inputTokens": null,
+        "outputTokens": null,
+        "cachedTokens": null,
+        "reasoningTokens": null,
+        "toolTokens": null,
+        "eventTimestamp": null
+      },
+      {
+        "logId": 3339369,
+        "timestamp": "2026-05-21T10:03:17+00:00",
+        "level": "TRACE",
+        "target": "codex_client::transport",
+        "conversationId": null,
+        "model": "gpt-5.5}:stream_request:model_client.stream_responses_api{model=gpt-5.5",
+        "inputTokens": null,
+        "outputTokens": null,
+        "cachedTokens": null,
+        "reasoningTokens": null,
+        "toolTokens": null,
+        "eventTimestamp": null
+      },
+      {
+        "logId": 3339012,
+        "timestamp": "2026-05-21T10:02:56+00:00",
+        "level": "TRACE",
+        "target": "codex_client::transport",
+        "conversationId": null,
+        "model": "gpt-5.5}:stream_request:model_client.stream_responses_api{model=gpt-5.5",
+        "inputTokens": null,
+        "outputTokens": null,
+        "cachedTokens": null,
+        "reasoningTokens": null,
+        "toolTokens": null,
+        "eventTimestamp": null
+      },
+      {
+        "logId": 3338569,
+        "timestamp": "2026-05-21T10:02:33+00:00",
+        "level": "TRACE",
+        "target": "codex_client::transport",
+        "conversationId": null,
+        "model": "gpt-5.5}:stream_request:model_client.stream_responses_api{model=gpt-5.5",
+        "inputTokens": null,
+        "outputTokens": null,
+        "cachedTokens": null,
+        "reasoningTokens": null,
+        "toolTokens": null,
+        "eventTimestamp": null
+      },
+      {
+        "logId": 3338179,
+        "timestamp": "2026-05-21T10:02:11+00:00",
+        "level": "TRACE",
+        "target": "codex_client::transport",
+        "conversationId": null,
+        "model": "gpt-5.5}:stream_request:model_client.stream_responses_api{model=gpt-5.5",
+        "inputTokens": null,
+        "outputTokens": null,
+        "cachedTokens": null,
+        "reasoningTokens": null,
+        "toolTokens": null,
+        "eventTimestamp": null
+      },
+      {
+        "logId": 3337677,
+        "timestamp": "2026-05-21T10:01:48+00:00",
+        "level": "TRACE",
+        "target": "codex_client::transport",
+        "conversationId": null,
+        "model": "gpt-5.5}:stream_request:model_client.stream_responses_api{model=gpt-5.5",
+        "inputTokens": null,
+        "outputTokens": null,
+        "cachedTokens": null,
+        "reasoningTokens": null,
+        "toolTokens": null,
+        "eventTimestamp": null
+      },
+      {
+        "logId": 3336606,
+        "timestamp": "2026-05-21T10:01:04+00:00",
+        "level": "TRACE",
+        "target": "codex_client::transport",
+        "conversationId": null,
+        "model": "gpt-5.5}:stream_request:model_client.stream_responses_api{model=gpt-5.5",
+        "inputTokens": null,
+        "outputTokens": null,
+        "cachedTokens": null,
+        "reasoningTokens": null,
+        "toolTokens": null,
+        "eventTimestamp": null
+      }
+    ],
+    "recentTurnIds": [
+      {
+        "logId": 3346633,
+        "timestamp": "2026-05-21T10:04:53+00:00",
+        "turnId": "019e49fb-ef31-7923-b599-522eedf285fe"
+      },
+      {
+        "logId": 3346632,
+        "timestamp": "2026-05-21T10:04:53+00:00",
+        "turnId": "019e49fb-ef31-7923-b599-522eedf285fe"
+      },
+      {
+        "logId": 3346631,
+        "timestamp": "2026-05-21T10:04:53+00:00",
+        "turnId": "019e49fb-ef31-7923-b599-522eedf285fe"
+      },
+      {
+        "logId": 3346630,
+        "timestamp": "2026-05-21T10:04:53+00:00",
+        "turnId": "019e49fb-ef31-7923-b599-522eedf285fe"
+      },
+      {
+        "logId": 3346629,
+        "timestamp": "2026-05-21T10:04:53+00:00",
+        "turnId": "019e49fb-ef31-7923-b599-522eedf285fe"
+      },
+      {
+        "logId": 3346628,
+        "timestamp": "2026-05-21T10:04:53+00:00",
+        "turnId": "019e49fb-ef31-7923-b599-522eedf285fe"
+      },
+      {
+        "logId": 3346627,
+        "timestamp": "2026-05-21T10:04:53+00:00",
+        "turnId": "019e49fb-ef31-7923-b599-522eedf285fe"
+      },
+      {
+        "logId": 3346626,
+        "timestamp": "2026-05-21T10:04:53+00:00",
+        "turnId": "019e49fb-ef31-7923-b599-522eedf285fe"
+      },
+      {
+        "logId": 3346625,
+        "timestamp": "2026-05-21T10:04:53+00:00",
+        "turnId": "019e49fb-ef31-7923-b599-522eedf285fe"
+      },
+      {
+        "logId": 3346624,
+        "timestamp": "2026-05-21T10:04:53+00:00",
+        "turnId": "019e49fb-ef31-7923-b599-522eedf285fe"
+      }
+    ]
+  }
+}
