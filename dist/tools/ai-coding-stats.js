@@ -2,13 +2,13 @@ import { z } from "zod";
 import { createCodeSnapshot, getCodeStatsSinceSnapshot, getWorkspaceCodeStats, loadRoundBaseline, saveRoundBaseline, } from "../code-stats.js";
 import { recordRound, recordRoundRevert } from "../database.js";
 const nonNegativeInteger = z.number().int().nonnegative();
-export function registerAiCodingStatsTools(server) {
+export function registerAiCodingStatsTools(server, hooks = {}) {
     server.tool("begin_ai_coding_round", "Capture a Git workspace baseline at the start of an AI Coding round. record_ai_coding_round can later use this baseline to compute per-round code line stats.", {
         conversationId: z.string().min(1).describe("Stable id for the AI Coding conversation/thread."),
         projectPath: z.string().min(1).describe("Absolute Git workspace path."),
         startedAt: z.string().datetime().optional().describe("Round start time, ISO 8601. Defaults to now."),
         metadata: z.record(z.unknown()).optional().describe("Optional extra structured data.")
-    }, async (input) => {
+    }, withLifecycle(hooks, async (input) => {
         const snapshot = await createCodeSnapshot(input.projectPath);
         const saved = await saveRoundBaseline(input.conversationId, input.projectPath, snapshot);
         const result = {
@@ -30,7 +30,7 @@ export function registerAiCodingStatsTools(server) {
             ],
             structuredContent: result
         };
-    });
+    }));
     server.tool("record_ai_coding_round", "Record one finished AI Coding round into local JSON storage. Code line stats are computed by this MCP from the saved begin_ai_coding_round baseline when available; token usage should be backfilled later from tool logs.", {
         conversationId: z
             .string()
@@ -57,7 +57,7 @@ export function registerAiCodingStatsTools(server) {
             .optional()
             .describe("Total consumed tokens. Defaults to inputTokens + outputTokens."),
         metadata: z.record(z.unknown()).optional().describe("Optional extra structured data.")
-    }, async (input) => {
+    }, withLifecycle(hooks, async (input) => {
         const projectPath = input.projectPath ?? stringValue(input.metadata?.projectPath) ?? projectFromConversationId(input.conversationId);
         const computedCodeStats = projectPath ? await computeMcpCodeStats(input.conversationId, projectPath) : null;
         const metadata = {
@@ -90,7 +90,7 @@ export function registerAiCodingStatsTools(server) {
             ],
             structuredContent: recorded
         };
-    });
+    }));
     server.tool("record_ai_coding_round_revert", "Record that a previous AI Coding round's code changes were reverted. The original round is preserved for audit, and effective statistics should exclude reverted rounds.", {
         conversationId: z
             .string()
@@ -118,7 +118,7 @@ export function registerAiCodingStatsTools(server) {
             .optional()
             .describe("Total consumed tokens for the revert operation. Defaults to inputTokens + outputTokens."),
         metadata: z.record(z.unknown()).optional().describe("Optional extra structured data.")
-    }, async (input) => {
+    }, withLifecycle(hooks, async (input) => {
         const recorded = await recordRoundRevert(input);
         return {
             content: [
@@ -129,7 +129,18 @@ export function registerAiCodingStatsTools(server) {
             ],
             structuredContent: recorded
         };
-    });
+    }));
+}
+function withLifecycle(hooks, handler) {
+    return async (input) => {
+        hooks.beforeRequest?.();
+        try {
+            return await handler(input);
+        }
+        finally {
+            hooks.afterRequest?.();
+        }
+    };
 }
 async function computeMcpCodeStats(conversationId, projectPath) {
     const baseline = await loadRoundBaseline(conversationId, projectPath);

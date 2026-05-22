@@ -11,7 +11,12 @@ import { recordRound, recordRoundRevert } from "../database.js";
 
 const nonNegativeInteger = z.number().int().nonnegative();
 
-export function registerAiCodingStatsTools(server: McpServer): void {
+type RequestLifecycleHooks = {
+  beforeRequest?: () => void;
+  afterRequest?: () => void;
+};
+
+export function registerAiCodingStatsTools(server: McpServer, hooks: RequestLifecycleHooks = {}): void {
   server.tool(
     "begin_ai_coding_round",
     "Capture a Git workspace baseline at the start of an AI Coding round. record_ai_coding_round can later use this baseline to compute per-round code line stats.",
@@ -21,7 +26,7 @@ export function registerAiCodingStatsTools(server: McpServer): void {
       startedAt: z.string().datetime().optional().describe("Round start time, ISO 8601. Defaults to now."),
       metadata: z.record(z.unknown()).optional().describe("Optional extra structured data.")
     },
-    async (input) => {
+    withLifecycle(hooks, async (input) => {
       const snapshot = await createCodeSnapshot(input.projectPath);
       const saved = await saveRoundBaseline(input.conversationId, input.projectPath, snapshot);
       const result = {
@@ -44,7 +49,7 @@ export function registerAiCodingStatsTools(server: McpServer): void {
         ],
         structuredContent: result
       };
-    }
+    })
   );
 
   server.tool(
@@ -77,7 +82,7 @@ export function registerAiCodingStatsTools(server: McpServer): void {
         .describe("Total consumed tokens. Defaults to inputTokens + outputTokens."),
       metadata: z.record(z.unknown()).optional().describe("Optional extra structured data.")
     },
-    async (input) => {
+    withLifecycle(hooks, async (input) => {
       const projectPath = input.projectPath ?? stringValue(input.metadata?.projectPath) ?? projectFromConversationId(input.conversationId);
       const computedCodeStats = projectPath ? await computeMcpCodeStats(input.conversationId, projectPath) : null;
       const metadata = {
@@ -111,7 +116,7 @@ export function registerAiCodingStatsTools(server: McpServer): void {
         ],
         structuredContent: recorded
       };
-    }
+    })
   );
 
   server.tool(
@@ -145,7 +150,7 @@ export function registerAiCodingStatsTools(server: McpServer): void {
         .describe("Total consumed tokens for the revert operation. Defaults to inputTokens + outputTokens."),
       metadata: z.record(z.unknown()).optional().describe("Optional extra structured data.")
     },
-    async (input) => {
+    withLifecycle(hooks, async (input) => {
       const recorded = await recordRoundRevert(input);
 
       return {
@@ -157,8 +162,22 @@ export function registerAiCodingStatsTools(server: McpServer): void {
         ],
         structuredContent: recorded
       };
-    }
+    })
   );
+}
+
+function withLifecycle<TInput, TResult>(
+  hooks: RequestLifecycleHooks,
+  handler: (input: TInput) => Promise<TResult>
+): (input: TInput) => Promise<TResult> {
+  return async (input) => {
+    hooks.beforeRequest?.();
+    try {
+      return await handler(input);
+    } finally {
+      hooks.afterRequest?.();
+    }
+  };
 }
 
 async function computeMcpCodeStats(conversationId: string, projectPath: string) {
