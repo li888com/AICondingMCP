@@ -276,8 +276,10 @@ function normalizePathForCompare(value: string): string {
 
 async function syncOnline(): Promise<void> {
   await patchAutoSyncState({
+    currentStep: "sync:online",
+    currentStatus: "running",
     lastOnlineSyncAt: new Date().toISOString(),
-    lastOnlineSyncStatus: "running",
+    lastOnlineSyncStartedAt: new Date().toISOString(),
   });
 
   const child = spawn(process.execPath, ["dist/sync-to-online.js"], {
@@ -300,7 +302,10 @@ async function syncOnline(): Promise<void> {
 
   await patchAutoSyncState({
     lastOnlineSyncAt: new Date().toISOString(),
+    lastOnlineSyncFinishedAt: new Date().toISOString(),
     lastOnlineSyncStatus: exitCode === 0 ? "completed" : "failed",
+    currentStep: null,
+    currentStatus: null,
     lastOnlineSyncSummary: {
       exitCode,
       output: output.trim().slice(-4000),

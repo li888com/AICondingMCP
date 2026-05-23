@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import { spawn, type ChildProcess } from "node:child_process";
+import { resolve } from "node:path";
 import { closePool } from "./database.js";
 import { registerAiCodingStatsTools } from "./tools/ai-coding-stats.js";
 
@@ -9,6 +11,7 @@ const idleTimeoutMs = readIdleTimeoutMs();
 let idleTimer: NodeJS.Timeout | null = null;
 let activeRequests = 0;
 let shuttingDown = false;
+let autoRunner: ChildProcess | null = null;
 
 const server = new McpServer({
   name: "ai-coding-stats-mcp",
@@ -31,6 +34,7 @@ process.on("SIGTERM", () => {
 });
 
 await server.connect(transport);
+startAutoRunner();
 scheduleIdleShutdown();
 
 function markRequestStarted(): void {
@@ -70,8 +74,56 @@ async function shutdown(exitCode: number): Promise<void> {
 
   shuttingDown = true;
   clearIdleTimer();
+  stopAutoRunner();
   await closePool();
   process.exit(exitCode);
+}
+
+function startAutoRunner(): void {
+  if (process.env.AI_CODING_MCP_AUTO_RUNNER === "0") {
+    return;
+  }
+
+  const scriptPath = resolve("dist", "auto-runner.js");
+  const projectPath = process.env.AI_CODING_PROJECT_PATH || process.cwd();
+  const conversationId = process.env.AI_CODING_CONVERSATION_ID || `codex:${resolve(projectPath).replaceAll("\\", "/")}`;
+  const settleMs = process.env.AI_CODING_AUTO_SETTLE_MS || "30000";
+
+  autoRunner = spawn(process.execPath, [
+    scriptPath,
+    "--project-path",
+    projectPath,
+    "--conversation-id",
+    conversationId,
+    "--settle-ms",
+    settleMs,
+  ], {
+    cwd: process.cwd(),
+    detached: false,
+    stdio: "ignore",
+    env: {
+      ...process.env,
+      AI_CODING_AUTO_SYNC_ONLINE: process.env.AI_CODING_AUTO_SYNC_ONLINE ?? "1",
+    },
+    windowsHide: true,
+  });
+
+  autoRunner.on("exit", () => {
+    autoRunner = null;
+  });
+}
+
+function stopAutoRunner(): void {
+  if (!autoRunner?.pid) {
+    return;
+  }
+
+  try {
+    autoRunner.kill();
+  } catch {
+    // The worker may already have exited.
+  }
+  autoRunner = null;
 }
 
 function readIdleTimeoutMs(): number {

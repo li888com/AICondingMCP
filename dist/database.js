@@ -29,10 +29,10 @@ export async function recordRound(input) {
     const resolution = resolveRequirementId(input.promptText, conversation.currentRequirementId);
     const codeLinesChanged = input.codeLinesChanged ?? (input.linesAdded ?? 0) + (input.linesDeleted ?? 0);
     const totalTokens = input.totalTokens ?? (input.inputTokens ?? 0) + (input.outputTokens ?? 0);
-    const tokenSource = totalTokens > 0 ? "mcp_payload" : "unavailable";
+    const tokenSource = totalTokens > 0 ? "mcp_payload" : "tool_log_backfill";
     const tokenMatchQuality = totalTokens > 0 ? "mcp_payload" : null;
     const tokenSyncStatus = totalTokens > 0 ? "synced" : "pending";
-    const tokenSyncNote = totalTokens > 0 ? null : "Token usage unavailable in MCP payload";
+    const tokenSyncNote = totalTokens > 0 ? null : "Token usage pending log backfill";
     // Create round
     const round = await localStorage.createRound({
         conversationId,
@@ -71,8 +71,13 @@ export async function recordRound(input) {
         requirementSource: round.requirementSource,
         modelName: round.modelName,
         durationMs,
+        filesChanged: round.filesChanged,
+        linesAdded: round.linesAdded,
+        linesDeleted: round.linesDeleted,
         codeLinesChanged: round.codeLinesChanged,
         totalTokens: round.totalTokens,
+        tokenSyncStatus: round.tokenSyncStatus,
+        metadata: round.metadata,
     };
 }
 export async function recordDialogueTokenUsage(input) {
@@ -134,6 +139,7 @@ export async function recordDialogueTokenUsage(input) {
         totalTokens: event.totalTokens,
         needsProjectBinding: event.roundId === null,
         warning,
+        sourceEventId: event.sourceEventId,
     };
 }
 export async function recordRoundRevert(input) {
@@ -249,6 +255,8 @@ async function normalizeMetadata(metadata, conversationId) {
                 normalized.taskId = binding.taskId;
             if (binding.selectedAt)
                 normalized.requirementSelectedAt = binding.selectedAt;
+            if (binding.conversationId)
+                normalized.requirementBindingConversationId = binding.conversationId;
             normalized.requirementBindingSource = "ai-coding-reporter";
         }
     }

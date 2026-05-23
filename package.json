@@ -21,10 +21,13 @@
     "sync:online": "tsx src/sync-to-online.ts",
     "sync:online:dry": "tsx src/sync-to-online.ts --dry-run",
     "tokens:backfill": "tsx src/token-backfill.ts",
-    "tokens:backfill:start": "node dist/token-backfill.js"
+    "tokens:backfill:start": "node dist/token-backfill.js",
+    "dialogue-turns:backfill": "tsx src/dialogue-turn-backfill.ts",
+    "dialogue-turns:backfill:start": "node dist/dialogue-turn-backfill.js"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.12.0",
+    "better-sqlite3": "^11.10.0",
     "zod": "^3.24.1"
   },
   "devDependencies": {

@@ -276,6 +276,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--client", choices=["codex", "claude-code", "all"], default="all")
     parser.add_argument("--limit", type=int, default=200)
+    parser.add_argument("--since", default="")
     args = parser.parse_args()
 
     events = []
@@ -283,6 +284,9 @@ def main():
         events.extend(codex_events(args.limit))
     if args.client in ("claude-code", "all"):
         events.extend(claude_events(args.limit))
+
+    if args.since:
+        events = [event for event in events if (event.get("endedAt") or "") >= args.since]
 
     events.sort(key=lambda item: item.get("endedAt") or "", reverse=True)
     print(json.dumps({"events": events[: args.limit]}, ensure_ascii=False, indent=2))

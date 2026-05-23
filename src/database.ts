@@ -27,8 +27,13 @@ export type RecordedRound = {
   requirementSource: "prompt" | "context" | "empty";
   modelName: string;
   durationMs: number;
+  filesChanged: number | null;
+  linesAdded: number;
+  linesDeleted: number;
   codeLinesChanged: number;
   totalTokens: number;
+  tokenSyncStatus: string;
+  metadata: Record<string, unknown> | null;
 };
 
 export type RecordDialogueTokenUsageInput = {
@@ -57,6 +62,7 @@ export type RecordedDialogueTokenUsage = {
   totalTokens: number;
   needsProjectBinding: boolean;
   warning: string | null;
+  sourceEventId: string | null;
 };
 
 export type RecordRoundRevertInput = {
@@ -120,10 +126,10 @@ export async function recordRound(input: RecordRoundInput): Promise<RecordedRoun
   const codeLinesChanged =
     input.codeLinesChanged ?? (input.linesAdded ?? 0) + (input.linesDeleted ?? 0);
   const totalTokens = input.totalTokens ?? (input.inputTokens ?? 0) + (input.outputTokens ?? 0);
-  const tokenSource = totalTokens > 0 ? "mcp_payload" : "unavailable";
+  const tokenSource = totalTokens > 0 ? "mcp_payload" : "tool_log_backfill";
   const tokenMatchQuality: localStorage.TokenMatchQuality | null = totalTokens > 0 ? "mcp_payload" : null;
   const tokenSyncStatus = totalTokens > 0 ? "synced" : "pending";
-  const tokenSyncNote = totalTokens > 0 ? null : "Token usage unavailable in MCP payload";
+  const tokenSyncNote = totalTokens > 0 ? null : "Token usage pending log backfill";
 
   // Create round
   const round = await localStorage.createRound({
@@ -166,8 +172,13 @@ export async function recordRound(input: RecordRoundInput): Promise<RecordedRoun
     requirementSource: round.requirementSource,
     modelName: round.modelName,
     durationMs,
+    filesChanged: round.filesChanged,
+    linesAdded: round.linesAdded,
+    linesDeleted: round.linesDeleted,
     codeLinesChanged: round.codeLinesChanged,
     totalTokens: round.totalTokens,
+    tokenSyncStatus: round.tokenSyncStatus,
+    metadata: round.metadata,
   };
 }
 
@@ -234,6 +245,7 @@ export async function recordDialogueTokenUsage(input: RecordDialogueTokenUsageIn
     totalTokens: event.totalTokens,
     needsProjectBinding: event.roundId === null,
     warning,
+    sourceEventId: event.sourceEventId,
   };
 }
 
@@ -360,6 +372,7 @@ async function normalizeMetadata(
       if (binding.projectName) normalized.projectName = binding.projectName;
       if (binding.taskId) normalized.taskId = binding.taskId;
       if (binding.selectedAt) normalized.requirementSelectedAt = binding.selectedAt;
+      if (binding.conversationId) normalized.requirementBindingConversationId = binding.conversationId;
       normalized.requirementBindingSource = "ai-coding-reporter";
     }
   }

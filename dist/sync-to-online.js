@@ -1,10 +1,9 @@
-import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
-import { dirname, resolve } from "node:path";
+import { readFile } from "node:fs/promises";
+import { resolve } from "node:path";
+import { getAllStorageData, getStorageInfo, updateRoundRevertSyncState, updateRoundSyncState, updateTokenUsageEventSyncState, } from "./local-storage.js";
 const args = parseArgs(process.argv.slice(2));
 const dryRun = args.dryRun;
 const storageDir = resolve(process.env.MCP_TOOLBOX_STORAGE_DIR?.trim() || ".mcp-toolbox");
-const storagePath = resolve(process.env.MCP_TOOLBOX_STORAGE_FILE?.trim() ||
-    resolve(storageDir, "data.json"));
 const reporterConfigPath = resolve("ai-token-vscode-codex-claude-code", ".ai-coding-reporter", "config.json");
 const mcpConfigPath = resolve(storageDir, "config.json");
 const configPaths = process.env.AI_CODING_SYNC_CONFIG_FILE?.trim()
@@ -29,23 +28,15 @@ async function main() {
         skipped: 0,
         failed: 0,
         processed: 0,
+        failures: [],
     };
     await syncRounds(data, report);
     await syncRoundReverts(data, report);
     await syncTokenUsageEvents(data, report);
-    if (!dryRun) {
-        await saveData(data);
-    }
     printReport(report);
 }
 async function loadData() {
-    return JSON.parse(await readFile(storagePath, "utf8"));
-}
-async function saveData(data) {
-    await mkdir(dirname(storagePath), { recursive: true });
-    const tempPath = `${storagePath}.tmp`;
-    await writeFile(tempPath, JSON.stringify(data, null, 2), "utf8");
-    await rename(tempPath, storagePath);
+    return getAllStorageData();
 }
 async function syncRounds(data, report) {
     const requirementsById = new Map((data.requirements || []).map((item) => [item.requirementId, item]));
@@ -57,10 +48,12 @@ async function syncRounds(data, report) {
         if (isLimitReached(report))
             break;
         const requirement = round.requirementId === null ? undefined : requirementsById.get(round.requirementId);
-        await uploadItem(round, report, "rounds", async () => {
+        const hasDemandBinding = typeof round.metadata?.demandId === "string" && round.metadata.demandId.trim().length > 0;
+        await uploadItem(round, report, "rounds", "round", turnApiPath, async () => {
             const turnId = buildTurnId(round);
+            const idempotencyKey = `local-turn-${turnId}`;
             const response = await request(turnApiPath, "POST", {
-                idempotencyKey: `local-turn-${turnId}`,
+                idempotencyKey,
                 turnId,
                 conversationId: round.conversationId,
                 employeeId: String(round.metadata?.employeeId ?? employeeId),
@@ -84,7 +77,7 @@ async function syncRounds(data, report) {
                 inputTokens: round.totalTokens > 0 ? round.inputTokens : null,
                 outputTokens: round.totalTokens > 0 ? round.outputTokens : null,
                 totalTokens: round.totalTokens > 0 ? round.totalTokens : null,
-                bindingLevel: round.metadata?.demandId ? "demand" : (round.requirementId === null ? "none" : "demand"),
+                bindingLevel: hasDemandBinding ? "demand" : (round.requirementId === null ? "none" : "demand"),
                 demandId: round.metadata?.demandId ?? null,
                 demandCode: round.metadata?.demandCode ?? (round.requirementId === null ? null : String(round.requirementId)),
                 demandName: round.metadata?.demandName ?? requirement?.title ?? null,
@@ -106,10 +99,9 @@ async function syncRounds(data, report) {
                     tokenSyncedAt: round.tokenSyncedAt,
                     tokenSyncNote: round.tokenSyncNote,
                 },
-            });
+            }, idempotencyKey);
             return parseOnlineId(response?.remoteId ?? response?.id ?? turnId, "turn response id");
         });
-        await saveCheckpoint(data);
     }
 }
 async function syncRoundReverts(data, report) {
@@ -121,10 +113,10 @@ async function syncRoundReverts(data, report) {
         if (isLimitReached(report))
             break;
         markSkipped(revert, "ai-codingTurns API does not define a revert endpoint.");
+        await persistSyncState("roundRevert", revert.id, revert._sync);
         report.roundReverts += 1;
         report.skipped += 1;
         report.processed += 1;
-        await saveCheckpoint(data);
     }
 }
 async function syncTokenUsageEvents(data, report) {
@@ -140,40 +132,43 @@ async function syncTokenUsageEvents(data, report) {
             : (data.rounds || []).find((round) => round.id === event.roundId) ?? null;
         if (event.roundId !== null && !localRound) {
             markFailed(event, `Missing local round ${event.roundId}`);
+            await persistSyncState("tokenUsageEvent", event.id, event._sync);
+            collectFailure(report, "tokenUsageEvent", event.id, "(local validation)", event._sync);
             report.failed += 1;
             report.processed += 1;
-            await saveCheckpoint(data);
             continue;
         }
-        await uploadItem(event, report, "tokenUsageEvents", async () => request(`${turnApiPath}/${encodeURIComponent(buildTokenEventTurnId(event, localRound))}/tokens`, "PATCH", {
-            sourceEventId: event.sourceEventId ?? `local-token-event-${event.id}`,
-            tokenStatus: event.matchQuality === "ambiguous" ? "needs_review" : "completed",
-            tokenSource: event.sourcePath.startsWith("mcp:") ? "mcp_payload" : "tool_log",
-            inputTokens: event.inputTokens,
-            outputTokens: event.outputTokens,
-            totalTokens: event.totalTokens,
-            cachedTokens: numberValue(event.rawEvent?.cachedTokens),
-            reasoningTokens: numberValue(event.rawEvent?.reasoningTokens),
-            toolTokens: event.totalTokens,
-            occurredAt: event.endedAt ?? event.startedAt ?? new Date().toISOString(),
-            metadata: {
-                tool: event.client,
-                conversationId: event.conversationId ?? localRound?.conversationId ?? null,
-                modelName: event.modelName ?? localRound?.modelName ?? null,
-                needsProjectBinding: event.roundId === null,
-                projectBindingWarning: event.roundId === null ? "No roundId was provided. Please bind this dialogue to a project/AI Coding round." : null,
-                sourcePath: event.sourcePath,
-                localTokenUsageEventId: event.id,
-                localRoundId: event.roundId,
-                matchStrategy: "mcp-token-sync",
-                confidence: event.matchQuality ?? null,
-                rawEvent: event.rawEvent,
-            },
-        }));
-        await saveCheckpoint(data);
+        await uploadItem(event, report, "tokenUsageEvents", "tokenUsageEvent", `${turnApiPath}/${encodeURIComponent(buildTokenEventTurnId(event, localRound))}/tokens`, async () => {
+            const sourceEventId = event.sourceEventId ?? `local-token-event-${event.id}`;
+            return request(`${turnApiPath}/${encodeURIComponent(buildTokenEventTurnId(event, localRound))}/tokens`, "PATCH", {
+                sourceEventId,
+                tokenStatus: event.matchQuality === "ambiguous" ? "needs_review" : "completed",
+                tokenSource: event.sourcePath.startsWith("mcp:") ? "mcp_payload" : "tool_log",
+                inputTokens: event.inputTokens,
+                outputTokens: event.outputTokens,
+                totalTokens: event.totalTokens,
+                cachedTokens: numberValue(event.rawEvent?.cachedTokens),
+                reasoningTokens: numberValue(event.rawEvent?.reasoningTokens),
+                toolTokens: event.totalTokens,
+                occurredAt: event.endedAt ?? event.startedAt ?? new Date().toISOString(),
+                metadata: {
+                    tool: event.client,
+                    conversationId: event.conversationId ?? localRound?.conversationId ?? null,
+                    modelName: event.modelName ?? localRound?.modelName ?? null,
+                    needsProjectBinding: event.roundId === null,
+                    projectBindingWarning: event.roundId === null ? "No roundId was provided. Please bind this dialogue to a project/AI Coding round." : null,
+                    sourcePath: event.sourcePath,
+                    localTokenUsageEventId: event.id,
+                    localRoundId: event.roundId,
+                    matchStrategy: "mcp-token-sync",
+                    confidence: event.matchQuality ?? null,
+                    rawEvent: event.rawEvent,
+                },
+            }, `token-event-${sourceEventId}`);
+        });
     }
 }
-async function uploadItem(item, report, key, upload) {
+async function uploadItem(item, report, key, entityType, endpoint, upload) {
     try {
         if (dryRun) {
             report[key] += 1;
@@ -182,20 +177,49 @@ async function uploadItem(item, report, key, upload) {
         }
         const result = await upload();
         markSynced(item, typeof result === "string" || typeof result === "number" ? result : undefined);
+        await persistSyncState(entityType, item.id, item._sync);
         report[key] += 1;
         report.processed += 1;
     }
     catch (error) {
+        if (entityType === "tokenUsageEvent" && isMissingOnlineTurnError(error)) {
+            markSkipped(item, `Online turn does not exist for token backfill: ${error instanceof Error ? error.message : String(error)}`);
+            await persistSyncState(entityType, item.id, item._sync);
+            report[key] += 1;
+            report.skipped += 1;
+            report.processed += 1;
+            return;
+        }
         markFailed(item, error instanceof Error ? error.message : String(error));
+        const syncState = item._sync;
+        if (syncState && isHttpError(error)) {
+            syncState.error = error.message;
+        }
+        await persistSyncState(entityType, item.id, syncState);
+        collectFailure(report, entityType, item.id, endpoint, syncState, error);
         report.failed += 1;
         report.processed += 1;
     }
 }
-async function request(path, method, body) {
+async function persistSyncState(entityType, entityId, syncState) {
+    if (dryRun || !syncState)
+        return;
+    if (entityType === "round") {
+        await updateRoundSyncState(entityId, syncState);
+    }
+    else if (entityType === "roundRevert") {
+        await updateRoundRevertSyncState(entityId, syncState);
+    }
+    else {
+        await updateTokenUsageEventSyncState(entityId, syncState);
+    }
+}
+async function request(path, method, body, idempotencyKey) {
     const response = await fetch(`${baseUrl}${path}`, {
         method,
         headers: {
-            "Content-Type": "application/json",
+            "Content-Type": "application/json; charset=utf-8",
+            ...(idempotencyKey ? { "Idempotency-Key": idempotencyKey } : {}),
             ...(token ? { Authorization: `Bearer ${token}` } : {}),
             ...(externalSysKey ? { sys_key: externalSysKey } : {}),
             ...(externalSysSecret ? { sys_secret: externalSysSecret } : {}),
@@ -205,7 +229,7 @@ async function request(path, method, body) {
     const text = await response.text();
     const parsed = text ? JSON.parse(text) : {};
     if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${parsed.msg || text || response.statusText}`);
+        throw new HttpRequestError(`HTTP ${response.status}: ${parsed.msg || text || response.statusText}`, response.status, text);
     }
     if (parsed.code !== undefined && parsed.code !== 0 && parsed.code !== 200) {
         throw new Error(parsed.msg || `API returned code ${parsed.code}`);
@@ -249,11 +273,6 @@ function markFailed(item, error) {
         lastAttemptAt: now.toISOString(),
         nextRetryAt: new Date(now.getTime() + delayMinutes * 60 * 1000).toISOString(),
     };
-}
-async function saveCheckpoint(data) {
-    if (!dryRun) {
-        await saveData(data);
-    }
 }
 function normalizePath(path) {
     const trimmed = path.trim();
@@ -346,7 +365,7 @@ function isLimitReached(report) {
     return report.processed >= args.limit;
 }
 function printReport(report) {
-    console.log(`Sync ${dryRun ? "dry run" : "completed"} for ${storagePath}`);
+    console.log(`Sync ${dryRun ? "dry run" : "completed"} for ${getStorageInfo().sqlitePath}`);
     console.log(`API base: ${baseUrl}`);
     console.log(`turnApiPath: ${turnApiPath}`);
     console.log(`limit: ${args.limit}`);
@@ -358,6 +377,41 @@ function printReport(report) {
     console.log(`retryDeferred: ${report.retryDeferred}`);
     console.log(`skipped: ${report.skipped}`);
     console.log(`failed: ${report.failed}`);
+    if (args.verbose && report.failures.length > 0) {
+        console.log("failures:");
+        for (const failure of report.failures) {
+            console.log(JSON.stringify(failure));
+        }
+    }
+}
+function collectFailure(report, entityType, entityId, endpoint, syncState, error) {
+    if (!args.verbose)
+        return;
+    report.failures.push({
+        entityType,
+        entityId,
+        endpoint: `${baseUrl}${endpoint}`,
+        error: syncState?.error ?? (error instanceof Error ? error.message : String(error ?? "unknown")),
+        ...(isHttpError(error) ? { status: error.status, body: error.body.slice(0, 2000) } : {}),
+        failedAttempts: syncState?.failedAttempts,
+        nextRetryAt: syncState?.nextRetryAt,
+    });
+}
+class HttpRequestError extends Error {
+    status;
+    body;
+    constructor(message, status, body) {
+        super(message);
+        this.status = status;
+        this.body = body;
+    }
+}
+function isHttpError(error) {
+    return error instanceof HttpRequestError;
+}
+function isMissingOnlineTurnError(error) {
+    const message = error instanceof Error ? error.message.toLowerCase() : String(error).toLowerCase();
+    return message.includes("turn does not exist") || (isHttpError(error) && error.status === 404);
 }
 function parseArgs(argv) {
     const parsed = {
@@ -365,12 +419,16 @@ function parseArgs(argv) {
         limit: readNumberEnv("ONLINE_SYNC_LIMIT", 200),
         retryFailedNow: false,
         roundId: null,
+        verbose: false,
     };
     for (let index = 0; index < argv.length; index += 1) {
         const arg = argv[index];
         const next = argv[index + 1];
         if (arg === "--dry-run") {
             parsed.dryRun = true;
+        }
+        else if (arg === "--verbose") {
+            parsed.verbose = true;
         }
         else if (arg === "--retry-failed-now") {
             parsed.retryFailedNow = true;

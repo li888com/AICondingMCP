@@ -33,7 +33,10 @@ async function main(): Promise<void> {
 async function runNpmScript(script: string, extraArgs: string[]): Promise<void> {
   const startedAt = new Date().toISOString();
   await patchAutoSyncState({
-    ...(script === "sync:online" ? { lastOnlineSyncAt: startedAt, lastOnlineSyncStatus: "running" } : {}),
+    currentStep: script,
+    currentStatus: "running",
+    ...(script === "sync:online" ? { lastOnlineSyncAt: startedAt, lastOnlineSyncStartedAt: startedAt } : {}),
+    ...(script === "tokens:backfill" ? { lastTokenSyncAt: startedAt, lastTokenSyncStartedAt: startedAt } : {}),
   });
 
   const command = process.platform === "win32" ? "cmd.exe" : "npm";
@@ -59,12 +62,28 @@ async function runNpmScript(script: string, extraArgs: string[]): Promise<void> 
   if (script === "sync:online") {
     await patchAutoSyncState({
       lastOnlineSyncAt: new Date().toISOString(),
+      lastOnlineSyncFinishedAt: new Date().toISOString(),
       lastOnlineSyncStatus: exitCode === 0 ? "completed" : "failed",
       lastOnlineSyncSummary: {
         script,
         exitCode,
         output: output.trim().slice(-4000),
       },
+      currentStep: null,
+      currentStatus: null,
+    });
+  } else if (script === "tokens:backfill") {
+    await patchAutoSyncState({
+      lastTokenSyncAt: new Date().toISOString(),
+      lastTokenSyncFinishedAt: new Date().toISOString(),
+      lastTokenSyncStatus: exitCode === 0 ? "completed" : "failed",
+      lastTokenSyncSummary: {
+        script,
+        exitCode,
+        output: output.trim().slice(-4000),
+      },
+      currentStep: null,
+      currentStatus: null,
     });
   }
 

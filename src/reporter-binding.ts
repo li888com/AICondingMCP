@@ -6,6 +6,7 @@ import { promisify } from "node:util";
 const execFileAsync = promisify(execFile);
 
 export type ReporterDemandBinding = {
+  conversationId: string | null;
   bindingLevel: "demand";
   demandId: string;
   demandCode: string | null;
@@ -19,6 +20,7 @@ export type ReporterDemandBinding = {
 
 type ReporterStatus = {
   selection?: {
+    conversationId?: unknown;
     bindingLevel?: unknown;
     demandId?: unknown;
     demandCode?: unknown;
@@ -80,6 +82,7 @@ function normalizeSelection(selection: ReporterStatus["selection"]): ReporterDem
   if (!demandId) return null;
 
   return {
+    conversationId: stringValue(selection.conversationId),
     bindingLevel: "demand",
     demandId,
     demandCode: stringValue(selection.demandCode),

@@ -50,6 +50,7 @@ function normalizeSelection(selection) {
     if (!demandId)
         return null;
     return {
+        conversationId: stringValue(selection.conversationId),
         bindingLevel: "demand",
         demandId,
         demandCode: stringValue(selection.demandCode),
